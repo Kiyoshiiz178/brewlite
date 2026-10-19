@@ -14,19 +14,6 @@ Bài tập lớn môn Công nghệ Phần mềm (Học kỳ I - Năm học 2026-
 
 ## 2. Phân công trách nhiệm & Danh sách Task hoàn thành
 
-### 2.1. Phân vai Backend Core & Database
-- **Người 1 — Code chính Backend**: Phụ trách API, database và tạo đơn
-  - **Task 1**: Khung backend, cấu hình chạy.
-  - **Task 2**: API `GET /products`.
-  - **Task 6**: API `POST /orders`, tạo đơn `PENDING`.
-  - Phối hợp xử lý phần backend của Task 7, 8, 10 khi cần tích hợp.
-- **Người 4 — Hỗ trợ Người 1**: Database, test API, review backend
-  - Thiết kế bảng database, migration và dữ liệu mẫu (`schema.prisma`, migrations, `seed.ts`).
-  - Viết test cho API sản phẩm và tạo đơn (`products.service.spec.ts`, `products.controller.spec.ts`, `orders.service.spec.ts`, `orders.controller.spec.ts`).
-  - Kiểm tra validate đầu vào (`class-validator`, `ParseIntPipe`), mã lỗi (400, 401, 404) và chuẩn hóa response JSON.
-  - Review Pull Request, hỗ trợ Docker Compose và tài liệu README.
-
-### 2.2. Danh sách 10 Task Scrum
 
 | Task | Tên Task | Người phụ trách | Mô tả & Tiêu chí nghiệm thu | Trạng thái |
 |---|---|---|---|---|
