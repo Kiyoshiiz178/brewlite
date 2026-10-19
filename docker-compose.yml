@@ -6,9 +6,41 @@ services:
       POSTGRES_PASSWORD: brewlite
       POSTGRES_DB: brewlite
     ports:
-      - 5432:5432
+      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U brewlite -d brewlite"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      DATABASE_URL: postgresql://brewlite:brewlite@db:5432/brewlite
+      PORT: 4000
+      JWT_SECRET: brewlite-super-secret-key-2026
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:4000
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:4000
+    depends_on:
+      - api
 
 volumes:
   pgdata:
