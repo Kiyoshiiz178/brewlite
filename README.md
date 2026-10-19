@@ -12,7 +12,7 @@ Bài tập lớn môn Công nghệ Phần mềm (Học kỳ I - Năm học 2026-
 
 ---
 
-## 2. Phân công trách nhiệm & Danh sách Task hoàn thành
+## 2. Danh sách Task hoàn thành
 
 
 | Task | Tên Task | Người phụ trách | Mô tả & Tiêu chí nghiệm thu | Trạng thái |
