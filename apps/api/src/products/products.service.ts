@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto.js';
 import { UpdateProductDto } from './dto/update-product.dto.js';
 import { PrismaService } from '../prisma/prisma.service.js';
@@ -7,23 +7,42 @@ import { PrismaService } from '../prisma/prisma.service.js';
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
-  create(_createProductDto: CreateProductDto) {
-    return 'This action adds a new product';
+  async create(createProductDto: CreateProductDto) {
+    return this.prisma.product.create({
+      data: {
+        name: createProductDto.name,
+        price: createProductDto.price,
+        imageUrl: createProductDto.imageUrl,
+        stock: createProductDto.stock ?? 0,
+        version: 0,
+      },
+    });
   }
 
   findAll() {
     return this.prisma.product.findMany();
   }
 
-  findOne(id: number) {
-    return this.prisma.product.findUnique({ where: { id } });
+  async findOne(id: number) {
+    const product = await this.prisma.product.findUnique({ where: { id } });
+    if (!product) {
+      throw new NotFoundException(`Không tìm thấy sản phẩm #${id}`);
+    }
+    return product;
   }
 
-  update(id: number, _updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(id: number, updateProductDto: UpdateProductDto) {
+    await this.findOne(id);
+    return this.prisma.product.update({
+      where: { id },
+      data: updateProductDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: number) {
+    await this.findOne(id);
+    return this.prisma.product.delete({
+      where: { id },
+    });
   }
 }

@@ -9,12 +9,33 @@ const prisma = new PrismaClient({ adapter });
 async function seed() {
   console.log('--- Đang khởi tạo dữ liệu mẫu (Seeding)... ---');
 
-  // 1. Seed Products
+  // Dọn dẹp các sản phẩm test nếu có
+  await prisma.orderItem.deleteMany({
+    where: {
+      OR: [
+        { product: { name: { startsWith: 'Test Product' } } },
+        { product: { name: { startsWith: 'Limited Drink' } } },
+        { product: { name: { startsWith: 'Promo Product' } } },
+      ],
+    },
+  });
+
+  await prisma.product.deleteMany({
+    where: {
+      OR: [
+        { name: { startsWith: 'Test Product' } },
+        { name: { startsWith: 'Limited Drink' } },
+        { name: { startsWith: 'Promo Product' } },
+      ],
+    },
+  });
+
+  // 1. Seed Products (Hình ảnh chuẩn đẹp cho menu)
   const products = [
     {
       name: 'Cà phê sữa đá',
       price: 35000,
-      imageUrl: 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=600&auto=format&fit=crop&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=600&auto=format&fit=crop&q=80',
       stock: 50,
       version: 0,
     },
@@ -42,14 +63,14 @@ async function seed() {
     {
       name: 'Bạc xỉu Sài Gòn',
       price: 38000,
-      imageUrl: 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=600&auto=format&fit=crop&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&auto=format&fit=crop&q=80',
       stock: 50,
       version: 0,
     },
     {
       name: 'Trà sen vàng macchiato',
       price: 48000,
-      imageUrl: 'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?w=600&auto=format&fit=crop&q=80',
+      imageUrl: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=600&auto=format&fit=crop&q=80',
       stock: 50,
       version: 0,
     },

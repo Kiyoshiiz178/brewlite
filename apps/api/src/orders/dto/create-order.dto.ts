@@ -1,5 +1,7 @@
 import {
+  ArrayMinSize,
   IsArray,
+  IsIn,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -16,6 +18,7 @@ export class CreateOrderItemDto {
 
   @IsString({ message: 'size phải là chuỗi' })
   @IsNotEmpty({ message: 'size không được để trống' })
+  @IsIn(['S', 'M', 'L', 's', 'm', 'l'], { message: 'size phải là S, M hoặc L' })
   size!: string; // 'S' | 'M' | 'L'
 
   @IsInt({ message: 'qty phải là số nguyên' })
@@ -30,6 +33,7 @@ export class CreateOrderItemDto {
 
 export class CreateOrderDto {
   @IsArray({ message: 'items phải là danh sách' })
+  @ArrayMinSize(1, { message: 'Giỏ hàng phải có ít nhất 1 sản phẩm' })
   @ValidateNested({ each: true })
   @Type(() => CreateOrderItemDto)
   items!: CreateOrderItemDto[];
