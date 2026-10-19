@@ -12,20 +12,33 @@ Bài tập lớn môn Công nghệ Phần mềm (Học kỳ I - Năm học 2026-
 
 ---
 
-## 2. Danh sách Chức năng & Task hoàn thành
+## 2. Phân công trách nhiệm & Tiến độ thực hiện
 
-| Task | Tên Task | Phân công | Mô tả & Tiêu chí nghiệm thu | Trạng thái |
+### 2.1. Phân vai trong nhóm (3 cặp)
+- **Cặp 1 — Backend Core & Database**: 
+  - **Tuân** (Code chính Backend): Phụ trách API, database và luồng tạo đơn (Task 1, 2, 6).
+  - **Quân** (Hỗ trợ Backend): Thiết kế database, migration, dữ liệu mẫu, test API, review PR.
+- **Cặp 2 — Frontend & Giao diện**: 
+  - **Trung** (Code chính Frontend): Phụ trách khung UI, menu, tùy chọn sản phẩm, giỏ hàng (Task 1, 3, 4, 5).
+  - **Tài** (Hỗ trợ Frontend): Bố cục responsive, component dùng chung, test giao diện và luồng mua hàng.
+- **Cặp 3 — Nghiệp vụ, Thanh toán & Scrum**: 
+  - **Tâm** (Code chính Nghiệp vụ): Xác thực JWT, thanh toán mock, màn hình xác nhận/lịch sử, State machine, tồn kho đồng thời (Task 7, 8, 9, 10).
+  - **Thịnh** (Hỗ trợ Nghiệp vụ & Scrum): Test nghiệp vụ/idempotency, tài liệu Scrum (Backlog, Burndown), kiểm tra Docker & README.
+
+### 2.2. Danh sách 10 Task theo Scrum
+
+| Task | Tên Task | Người phụ trách | Mô tả & Tiêu chí nghiệm thu | Trạng thái |
 |---|---|---|---|---|
-| **Task 1** | Khởi tạo dự án và cấu trúc | Nhóm | Monorepo Next.js + NestJS + Docker Compose + Git | ✅ Hoàn thành |
-| **Task 2** | API danh sách sản phẩm | Nhóm | `GET /products`, `GET /products/:id` từ PostgreSQL | ✅ Hoàn thành |
-| **Task 3** | Trang Menu (Frontend) | Thành viên A | Next.js render lưới đồ uống, loading/empty states | ⏳ Đang thực hiện |
-| **Task 4** | Chi tiết & tùy chọn sản phẩm | Thành viên B | Chọn size (S/M/L), topping (Trân châu, Kem cheese, Thạch), tính giá động | ⏳ Đang thực hiện |
-| **Task 5** | Giỏ hàng (Cart) | Thành viên C | Thêm, sửa số lượng, xóa món, lưu trạng thái giỏ, badge đếm số lượng | ⏳ Đang thực hiện |
-| **Task 6** | API tạo đơn hàng | Thành viên D | `POST /orders`, validate class-validator, lưu trạng thái PENDING | ⏳ Đang thực hiện |
-| **Task 7** | Đăng ký / Đăng nhập (JWT) | Bạn (PR #3) | `POST /auth/register`, `POST /auth/login`, băm bcrypt, cấp JWT, bảo vệ route đơn hàng | ✅ Hoàn thành |
-| **Task 8** | Thanh toán không tiền mặt | Bạn (PR #4) | `POST /payments`, chọn Ví điện tử / Thẻ, chuyển `PAID` khi thành công, `PAYMENT_FAILED` khi lỗi | ✅ Hoàn thành |
-| **Task 9** | Xác nhận, lịch sử đơn & bàn giao | Bạn (PR #6) | Màn hình xác nhận mã đơn (#1042), `GET /orders/me`, Docker Compose 3 services | 🔄 Đang nghiệm thu |
-| **Task 10**| Nghiệp vụ Backend nâng cao | Bạn (PR #5) | Order State Machine, Idempotent Payment, Optimistic Locking tồn kho, Loyalty Points | 🔄 Đang nghiệm thu |
+| **Task 1** | Khởi tạo dự án và cấu trúc | Cả nhóm | Monorepo Next.js + NestJS + Docker Compose + Git | ✅ Hoàn thành |
+| **Task 2** | API danh sách sản phẩm | Tuân, Quân | `GET /products`, `GET /products/:id` từ PostgreSQL | ✅ Hoàn thành |
+| **Task 3** | Trang Menu (Frontend) | Trung, Tài | Next.js render lưới đồ uống, loading/empty states | ⏳ Đang thực hiện |
+| **Task 4** | Chi tiết & tùy chọn sản phẩm | Trung, Tài | Chọn size (S/M/L), topping (Trân châu, Kem cheese, Thạch), tính giá động | ⏳ Đang thực hiện |
+| **Task 5** | Giỏ hàng (Cart) | Trung, Tài | Thêm, sửa số lượng, xóa món, lưu trạng thái giỏ, badge đếm số lượng | ⏳ Đang thực hiện |
+| **Task 6** | API tạo đơn hàng | Tuân, Quân | `POST /orders`, validate class-validator, lưu trạng thái PENDING | ⏳ Đang thực hiện |
+| **Task 7** | Đăng ký / Đăng nhập (JWT) | Tâm, Thịnh | `POST /auth/register`, `POST /auth/login`, băm bcrypt, cấp JWT, bảo vệ route đơn hàng | ✅ Hoàn thành |
+| **Task 8** | Thanh toán không tiền mặt | Tâm, Thịnh | `POST /payments`, chọn Ví điện tử / Thẻ, chuyển `PAID` khi thành công, `PAYMENT_FAILED` khi lỗi | ✅ Hoàn thành |
+| **Task 9** | Xác nhận, lịch sử đơn & bàn giao | Tâm, Thịnh | Màn hình xác nhận mã đơn (#1042), `GET /orders/me`, Docker Compose 3 services | 🔄 Đang nghiệm thu |
+| **Task 10**| Nghiệp vụ Backend nâng cao | Tâm, Thịnh | Order State Machine, Idempotent Payment, Optimistic Locking tồn kho, Loyalty Points | 🔄 Đang nghiệm thu |
 
 ---
 
