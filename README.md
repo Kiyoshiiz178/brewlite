@@ -14,18 +14,18 @@ Bài tập lớn môn Công nghệ Phần mềm (Học kỳ I - Năm học 2026-
 
 ## 2. Danh sách Chức năng & Task hoàn thành
 
-| Task | Tên Task | Mô tả & Tiêu chí nghiệm thu | Trạng thái |
-|---|---|---|---|
-| **Task 1** | Khởi tạo dự án và cấu trúc | Monorepo Next.js + NestJS + Docker Compose + Git | ✅ Hoàn thành |
-| **Task 2** | API danh sách sản phẩm | `GET /products`, `GET /products/:id` từ PostgreSQL | ✅ Hoàn thành |
-| **Task 3** | Trang Menu (Frontend) | Next.js render lưới đồ uống, loading/empty states | ✅ Hoàn thành |
-| **Task 4** | Chi tiết & tùy chọn sản phẩm | Chọn size (S/M/L), topping (Trân châu, Kem cheese, Thạch), tính giá động | ✅ Hoàn thành |
-| **Task 5** | Giỏ hàng (Cart) | Thêm, sửa số lượng, xóa món, lưu trạng thái giỏ, badge đếm số lượng | ✅ Hoàn thành |
-| **Task 6** | API tạo đơn hàng | `POST /orders`, validate class-validator, lưu trạng thái PENDING | ✅ Hoàn thành |
-| **Task 7** | Đăng ký / Đăng nhập (JWT) | `POST /auth/register`, `POST /auth/login`, băm bcrypt, cấp JWT, bảo vệ route đơn hàng | ✅ Hoàn thành |
-| **Task 8** | Thanh toán không tiền mặt | `POST /payments`, chọn Ví điện tử / Thẻ, chuyển `PAID` khi thành công, `PAYMENT_FAILED` khi lỗi | ✅ Hoàn thành |
-| **Task 9** | Xác nhận, lịch sử đơn & bàn giao | Màn hình xác nhận mã đơn (#1042), `GET /orders/me`, Docker Compose 3 services | ✅ Hoàn thành |
-| **Task 10**| Nghiệp vụ Backend nâng cao | Order State Machine, Idempotent Payment, Optimistic Locking tồn kho, Loyalty Points | ✅ Hoàn thành |
+| Task | Tên Task | Phân công | Mô tả & Tiêu chí nghiệm thu | Trạng thái |
+|---|---|---|---|---|
+| **Task 1** | Khởi tạo dự án và cấu trúc | Nhóm | Monorepo Next.js + NestJS + Docker Compose + Git | ✅ Hoàn thành |
+| **Task 2** | API danh sách sản phẩm | Nhóm | `GET /products`, `GET /products/:id` từ PostgreSQL | ✅ Hoàn thành |
+| **Task 3** | Trang Menu (Frontend) | Thành viên A | Next.js render lưới đồ uống, loading/empty states | ⏳ Đang thực hiện |
+| **Task 4** | Chi tiết & tùy chọn sản phẩm | Thành viên B | Chọn size (S/M/L), topping (Trân châu, Kem cheese, Thạch), tính giá động | ⏳ Đang thực hiện |
+| **Task 5** | Giỏ hàng (Cart) | Thành viên C | Thêm, sửa số lượng, xóa món, lưu trạng thái giỏ, badge đếm số lượng | ⏳ Đang thực hiện |
+| **Task 6** | API tạo đơn hàng | Thành viên D | `POST /orders`, validate class-validator, lưu trạng thái PENDING | ⏳ Đang thực hiện |
+| **Task 7** | Đăng ký / Đăng nhập (JWT) | Bạn (PR #3) | `POST /auth/register`, `POST /auth/login`, băm bcrypt, cấp JWT, bảo vệ route đơn hàng | ✅ Hoàn thành |
+| **Task 8** | Thanh toán không tiền mặt | Bạn (PR #4) | `POST /payments`, chọn Ví điện tử / Thẻ, chuyển `PAID` khi thành công, `PAYMENT_FAILED` khi lỗi | ✅ Hoàn thành |
+| **Task 9** | Xác nhận, lịch sử đơn & bàn giao | Bạn (PR #6) | Màn hình xác nhận mã đơn (#1042), `GET /orders/me`, Docker Compose 3 services | 🔄 Đang nghiệm thu |
+| **Task 10**| Nghiệp vụ Backend nâng cao | Bạn (PR #5) | Order State Machine, Idempotent Payment, Optimistic Locking tồn kho, Loyalty Points | 🔄 Đang nghiệm thu |
 
 ---
 
