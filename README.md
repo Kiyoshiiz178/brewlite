@@ -12,20 +12,34 @@ Bài tập lớn môn Công nghệ Phần mềm (Học kỳ I - Năm học 2026-
 
 ---
 
-## 2. Danh sách Chức năng & Task hoàn thành
+## 2. Phân công trách nhiệm & Danh sách Task hoàn thành
 
-| Task | Tên Task | Phân công | Mô tả & Tiêu chí nghiệm thu | Trạng thái |
+### 2.1. Phân vai Backend Core & Database
+- **Người 1 — Code chính Backend**: Phụ trách API, database và tạo đơn
+  - **Task 1**: Khung backend, cấu hình chạy.
+  - **Task 2**: API `GET /products`.
+  - **Task 6**: API `POST /orders`, tạo đơn `PENDING`.
+  - Phối hợp xử lý phần backend của Task 7, 8, 10 khi cần tích hợp.
+- **Người 4 — Hỗ trợ Người 1**: Database, test API, review backend
+  - Thiết kế bảng database, migration và dữ liệu mẫu (`schema.prisma`, migrations, `seed.ts`).
+  - Viết test cho API sản phẩm và tạo đơn (`products.service.spec.ts`, `products.controller.spec.ts`, `orders.service.spec.ts`, `orders.controller.spec.ts`).
+  - Kiểm tra validate đầu vào (`class-validator`, `ParseIntPipe`), mã lỗi (400, 401, 404) và chuẩn hóa response JSON.
+  - Review Pull Request, hỗ trợ Docker Compose và tài liệu README.
+
+### 2.2. Danh sách 10 Task Scrum
+
+| Task | Tên Task | Người phụ trách | Mô tả & Tiêu chí nghiệm thu | Trạng thái |
 |---|---|---|---|---|
-| **Task 1** | Khởi tạo dự án và cấu trúc | Nhóm | Monorepo Next.js + NestJS + Docker Compose + Git | ✅ Hoàn thành |
-| **Task 2** | API danh sách sản phẩm | Nhóm | `GET /products`, `GET /products/:id` từ PostgreSQL | ✅ Hoàn thành |
-| **Task 3** | Trang Menu (Frontend) | Thành viên A | Next.js render lưới đồ uống, loading/empty states | ⏳ Đang thực hiện |
-| **Task 4** | Chi tiết & tùy chọn sản phẩm | Thành viên B | Chọn size (S/M/L), topping (Trân châu, Kem cheese, Thạch), tính giá động | ⏳ Đang thực hiện |
-| **Task 5** | Giỏ hàng (Cart) | Thành viên C | Thêm, sửa số lượng, xóa món, lưu trạng thái giỏ, badge đếm số lượng | ⏳ Đang thực hiện |
-| **Task 6** | API tạo đơn hàng | Thành viên D | `POST /orders`, validate class-validator, lưu trạng thái PENDING | ⏳ Đang thực hiện |
-| **Task 7** | Đăng ký / Đăng nhập (JWT) | Bạn (PR #3) | `POST /auth/register`, `POST /auth/login`, băm bcrypt, cấp JWT, bảo vệ route đơn hàng | ✅ Hoàn thành |
-| **Task 8** | Thanh toán không tiền mặt | Bạn (PR #4) | `POST /payments`, chọn Ví điện tử / Thẻ, chuyển `PAID` khi thành công, `PAYMENT_FAILED` khi lỗi | ✅ Hoàn thành |
-| **Task 9** | Xác nhận, lịch sử đơn & bàn giao | Bạn (PR #6) | Màn hình xác nhận mã đơn (#1042), `GET /orders/me`, Docker Compose 3 services | 🔄 Đang nghiệm thu |
-| **Task 10**| Nghiệp vụ Backend nâng cao | Bạn (PR #5) | Order State Machine, Idempotent Payment, Optimistic Locking tồn kho, Loyalty Points | 🔄 Đang nghiệm thu |
+| **Task 1** | Khởi tạo dự án và cấu trúc | Người 1, Người 4 | Monorepo Next.js + NestJS + Docker Compose + Git | ✅ Hoàn thành |
+| **Task 2** | API danh sách sản phẩm | Người 1, Người 4 | `GET /products`, `GET /products/:id` từ PostgreSQL | ✅ Hoàn thành |
+| **Task 3** | Trang Menu (Frontend) | Frontend Team | Next.js render lưới đồ uống, loading/empty states | ✅ Hoàn thành |
+| **Task 4** | Chi tiết & tùy chọn sản phẩm | Frontend Team | Chọn size (S/M/L), topping (Trân châu, Kem cheese, Thạch), tính giá động | ✅ Hoàn thành |
+| **Task 5** | Giỏ hàng (Cart) | Frontend Team | Thêm, sửa số lượng, xóa món, lưu trạng thái giỏ, badge đếm số lượng | ✅ Hoàn thành |
+| **Task 6** | API tạo đơn hàng | Người 1, Người 4 | `POST /orders`, validate class-validator, lưu trạng thái PENDING | ✅ Hoàn thành |
+| **Task 7** | Đăng ký / Đăng nhập (JWT) | Auth/Business | `POST /auth/register`, `POST /auth/login`, băm bcrypt, cấp JWT, bảo vệ route đơn hàng | ✅ Hoàn thành |
+| **Task 8** | Thanh toán không tiền mặt | Auth/Business | `POST /payments`, chọn Ví điện tử / Thẻ, chuyển `PAID` khi thành công, `PAYMENT_FAILED` khi lỗi | ✅ Hoàn thành |
+| **Task 9** | Xác nhận, lịch sử đơn & bàn giao | Toàn đội | Màn hình xác nhận mã đơn (#1042), `GET /orders/me`, Docker Compose 3 services | ✅ Hoàn thành |
+| **Task 10**| Nghiệp vụ Backend nâng cao | Toàn đội | Order State Machine, Idempotent Payment, Optimistic Locking tồn kho, Loyalty Points | ✅ Hoàn thành |
 
 ---
 
@@ -123,18 +137,29 @@ npm run dev
 
 ---
 
-## 6. Chạy Test Suites (Minh chứng tiêu chí Task 10)
+## 6. Chạy Test Suites (Minh chứng tiêu chí kiểm thử)
 
-Hệ thống bao gồm bộ test kiểm thử tự động toàn diện với Vitest:
+Hệ thống bao gồm bộ test kiểm thử tự động toàn diện với Vitest gồm 8 suites (42 test cases):
 ```bash
 cd apps/api
 npm run test
 ```
-Kết quả kiểm thử chứng minh:
-- `(a)` Chặn thành công mọi chuyển trạng thái sai (`assertTransition`).
-- `(b)` Gửi lặp lại cùng `Idempotency-Key` chỉ tạo 1 bản ghi payment và không nhân đôi điểm loyalty.
-- `(c)` Đặt đơn đồng thời không bao giờ vượt quá số lượng tồn kho (Optimistic Locking).
-- `(d)` Áp mã giảm giá và tích lũy điểm thưởng chính xác.
+
+### Danh sách các bộ Unit & Integration Tests:
+1. **API Sản phẩm (Task 2 - Người 1 & Người 4)**:
+   - `src/products/products.service.spec.ts`: Test `findAll`, `findOne` (thành công và ném 404), `create`, `update`, `remove`.
+   - `src/products/products.controller.spec.ts`: Test controller endpoints với `ParseIntPipe`.
+2. **API Đặt hàng & Giỏ hàng (Task 6 - Người 1 & Người 4)**:
+   - `src/orders/orders.service.spec.ts`: Test tạo đơn `PENDING`, tính giá động size/topping, áp mã voucher, kiểm tra tồn kho, phát hiện xung đột optimistic locking, ném lỗi 400/404 khi vi phạm, lịch sử `findMyOrders`, cập nhật trạng thái `updateStatus`.
+   - `src/orders/orders.controller.spec.ts`: Test controller bảo vệ bởi `JwtAuthGuard`.
+3. **API Xác thực (Task 7)**:
+   - `src/auth/auth.service.spec.ts` & `src/auth/auth.controller.spec.ts`: Test đăng ký, đăng nhập bcrypt, phát token JWT.
+4. **Nghiệp vụ nâng cao (Task 10 & DoD)**:
+   - `test/task10.spec.ts`:
+     - `(a)` Chặn thành công mọi chuyển trạng thái sai (`assertTransition`).
+     - `(b)` Gửi lặp lại cùng `Idempotency-Key` chỉ tạo 1 bản ghi payment và không nhân đôi điểm loyalty.
+     - `(c)` Đặt đơn đồng thời không bao giờ vượt quá số lượng tồn kho (Optimistic Locking).
+     - `(d)` Áp mã giảm giá và tích lũy điểm thưởng chính xác.
 
 ---
 

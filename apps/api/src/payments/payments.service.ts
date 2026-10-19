@@ -6,11 +6,23 @@ import { PrismaService } from '../prisma/prisma.service.js';
 import { CreatePaymentDto } from './dto/create-payment.dto.js';
 import { OrderStatus, assertTransition } from '../orders/order-state-machine.js';
 
+export interface ProcessPaymentResult {
+  success: boolean;
+  message: string;
+  orderId: number;
+  status: string;
+  isIdempotentReplay?: boolean;
+  paymentId?: number;
+  amount?: number;
+  method?: string;
+  pointsEarned?: number;
+}
+
 @Injectable()
 export class PaymentsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async processPayment(dto: CreatePaymentDto) {
+  async processPayment(dto: CreatePaymentDto): Promise<ProcessPaymentResult> {
     // 1. Kiểm tra Idempotency (Task 10.2)
     // Nếu idempotencyKey đã tồn tại -> trả lại kết quả cũ, không trừ tiền hay tích điểm lần 2
     const existingPayment = await this.prisma.payment.findUnique({
