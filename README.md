@@ -37,8 +37,8 @@ Bài tập lớn môn Công nghệ Phần mềm (Học kỳ I - Năm học 2026-
 | **Task 6** | API tạo đơn hàng | Tuân, Quân | `POST /orders`, validate class-validator, lưu trạng thái PENDING | ⏳ Đang thực hiện |
 | **Task 7** | Đăng ký / Đăng nhập (JWT) | Tâm, Thịnh | `POST /auth/register`, `POST /auth/login`, băm bcrypt, cấp JWT, bảo vệ route đơn hàng | ✅ Hoàn thành |
 | **Task 8** | Thanh toán không tiền mặt | Tâm, Thịnh | `POST /payments`, chọn Ví điện tử / Thẻ, chuyển `PAID` khi thành công, `PAYMENT_FAILED` khi lỗi | ✅ Hoàn thành |
-| **Task 9** | Xác nhận, lịch sử đơn & bàn giao | Tâm, Thịnh | Màn hình xác nhận mã đơn (#1042), `GET /orders/me`, Docker Compose 3 services | 🔄 Đang nghiệm thu |
-| **Task 10**| Nghiệp vụ Backend nâng cao | Tâm, Thịnh | Order State Machine, Idempotent Payment, Optimistic Locking tồn kho, Loyalty Points | 🔄 Đang nghiệm thu |
+| **Task 9** | Xác nhận, lịch sử đơn & bàn giao | Tâm, Thịnh | Màn hình xác nhận mã đơn (#1042), `GET /orders/me`, Docker Compose 3 services | ✅ Hoàn thành |
+| **Task 10**| Nghiệp vụ Backend nâng cao | Tâm, Thịnh | Order State Machine, Idempotent Payment, Optimistic Locking tồn kho, Loyalty Points | ✅ Hoàn thành |
 
 ---
 
