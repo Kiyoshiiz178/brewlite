@@ -7,7 +7,7 @@ import { PrismaService } from '../prisma/prisma.service.js';
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
-  create(createProductDto: CreateProductDto) {
+  create(_createProductDto: CreateProductDto) {
     return 'This action adds a new product';
   }
 
@@ -19,7 +19,7 @@ export class ProductsService {
     return this.prisma.product.findUnique({ where: { id } });
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
+  update(id: number, _updateProductDto: UpdateProductDto) {
     return `This action updates a #${id} product`;
   }
 

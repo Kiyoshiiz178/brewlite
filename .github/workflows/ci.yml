@@ -1,0 +1,63 @@
+name: BrewLite CI
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: brewlite
+          POSTGRES_PASSWORD: brewlite
+          POSTGRES_DB: brewlite
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies (API & Web)
+        run: |
+          cd apps/api && npm install
+          cd ../web && npm install
+
+      - name: Prisma Generate & Migrate (API)
+        env:
+          DATABASE_URL: postgresql://brewlite:brewlite@localhost:5432/brewlite
+        run: |
+          cd apps/api
+          npx prisma generate
+          npx prisma migrate deploy
+
+      - name: Check Lint and Test (API)
+        env:
+          DATABASE_URL: postgresql://brewlite:brewlite@localhost:5432/brewlite
+          JWT_SECRET: brewlite-super-secret-key-2026
+        run: |
+          cd apps/api
+          npm run lint
+          npm run test
+          npm run build
+
+      - name: Check Lint and Build (Web)
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:4000
+        run: |
+          cd apps/web
+          npx eslint .
+          npm run build
