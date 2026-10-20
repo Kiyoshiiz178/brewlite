@@ -102,6 +102,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={onOpenCart}
             className="relative flex items-center justify-center p-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white shadow-lg shadow-amber-600/30 transition transform active:scale-95"
             title="Xem giỏ hàng"
+            aria-label={`Xem giỏ hàng (${cartCount} ly)`}
           >
             <ShoppingBag className="w-5 h-5" />
             {cartCount > 0 && (
