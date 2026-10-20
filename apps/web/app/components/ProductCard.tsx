@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import { Plus, Coffee } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { Product } from '../types';
 
 interface ProductCardProps {

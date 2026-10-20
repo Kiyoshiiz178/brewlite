@@ -4,6 +4,8 @@
 import React from 'react';
 import { X, Trash2, Plus, Minus, ArrowRight, ShoppingBag } from 'lucide-react';
 import { CartItem } from '../types';
+import { cartTotal, qtyOfProduct } from '../lib/cart';
+import { formatVnd, toppingLabel } from '../lib/pricing';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -24,11 +26,16 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 }) => {
   if (!isOpen) return null;
 
-  const total = items.reduce((acc, item) => acc + item.lineTotal, 0);
+  const total = cartTotal(items);
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden bg-black/70 backdrop-blur-sm animate-fade-in flex justify-end">
-      <div className="w-full max-w-md bg-stone-900 border-l border-stone-800 text-stone-100 h-full flex flex-col shadow-2xl animate-slide-left">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Giỏ hàng"
+        className="w-full max-w-md bg-stone-900 border-l border-stone-800 text-stone-100 h-full flex flex-col shadow-2xl animate-slide-left"
+      >
         {/* Header */}
         <div className="p-4 border-b border-stone-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -40,6 +47,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
           </div>
           <button
             onClick={onClose}
+            aria-label="Đóng giỏ hàng"
             className="p-2 rounded-xl text-stone-400 hover:text-white hover:bg-stone-800 transition"
           >
             <X className="w-5 h-5" />
@@ -79,7 +87,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                         </span>
                         {item.toppings.length > 0 && (
                           <span className="text-[11px] text-stone-400">
-                            + {item.toppings.join(', ')}
+                            + {item.toppings.map(toppingLabel).join(', ')}
                           </span>
                         )}
                       </div>
@@ -90,6 +98,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     onClick={() => onRemoveItem(item.id)}
                     className="p-1.5 text-stone-500 hover:text-rose-400 transition"
                     title="Xóa"
+                    aria-label={`Xóa ${item.product.name} khỏi giỏ`}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -100,6 +109,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   <div className="flex items-center space-x-2 bg-stone-900 border border-stone-700 rounded-lg p-0.5">
                     <button
                       onClick={() => onUpdateQty(item.id, -1)}
+                      aria-label={`Giảm số lượng ${item.product.name}`}
                       className="p-1 text-stone-400 hover:text-white rounded"
                     >
                       <Minus className="w-3.5 h-3.5" />
@@ -109,7 +119,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     </span>
                     <button
                       onClick={() => onUpdateQty(item.id, 1)}
-                      disabled={item.qty >= item.product.stock}
+                      disabled={qtyOfProduct(items, item.product.id) >= item.product.stock}
+                      aria-label={`Tăng số lượng ${item.product.name}`}
                       className="p-1 text-stone-400 hover:text-white rounded disabled:opacity-30"
                     >
                       <Plus className="w-3.5 h-3.5" />
@@ -118,7 +129,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
                   {/* Line Total */}
                   <div className="text-sm font-bold text-amber-400">
-                    {item.lineTotal.toLocaleString('vi-VN')}đ
+                    {formatVnd(item.lineTotal)}
                   </div>
                 </div>
               </div>
@@ -132,7 +143,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
             <div className="flex items-center justify-between">
               <span className="text-sm text-stone-400">Tổng thanh toán</span>
               <div className="text-xl font-bold text-amber-500">
-                {total.toLocaleString('vi-VN')}đ
+                {formatVnd(total)}
               </div>
             </div>
 

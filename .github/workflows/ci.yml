@@ -60,4 +60,5 @@ jobs:
         run: |
           cd apps/web
           npx eslint .
-          npm run build
+          npm run test
+          npm run build
