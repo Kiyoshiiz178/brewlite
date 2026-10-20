@@ -10,25 +10,38 @@ interface ProductCardProps {
   onSelect: (product: Product) => void;
 }
 
+const resolveDrinkImage = (name: string, imageUrl?: string | null): string => {
+  if (imageUrl && imageUrl.trim().length > 0) return imageUrl;
+  const n = name.toLowerCase();
+  if (n.includes('sữa') || n.includes('sua')) return '/drinks/ca-phe-sua-da.jpg';
+  if (n.includes('đào') || n.includes('dao')) return '/drinks/tra-dao-cam-sa.jpg';
+  if (n.includes('americano')) return '/drinks/americano.jpg';
+  if (n.includes('cappuccino')) return '/drinks/cappuccino.jpg';
+  if (n.includes('bạc xỉu') || n.includes('bac xiu')) return '/drinks/bac-xiu.jpg';
+  if (n.includes('sen')) return '/drinks/tra-sen-vang.jpg';
+  return '/drinks/ca-phe-sua-da.jpg';
+};
+
 export const ProductCard: React.FC<ProductCardProps> = ({ product, onSelect }) => {
   const isOutOfStock = product.stock <= 0;
+  const imageSrc = resolveDrinkImage(product.name, product.imageUrl);
 
   return (
     <div className="group bg-stone-900 border border-stone-800 rounded-2xl overflow-hidden hover:border-amber-500/50 hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-300 flex flex-col">
       {/* Product Image */}
       <div className="relative aspect-4/3 w-full bg-stone-800 overflow-hidden">
-        {product.imageUrl ? (
-          <img
-            src={product.imageUrl}
-            alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            loading="lazy"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-stone-600">
-            <Coffee className="w-12 h-12" />
-          </div>
-        )}
+        <img
+          src={imageSrc}
+          alt={product.name}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
+          onError={(e) => {
+            const fallback = resolveDrinkImage(product.name, null);
+            if (e.currentTarget.src !== fallback) {
+              e.currentTarget.src = fallback;
+            }
+          }}
+        />
         
         {/* Stock badge */}
         <div className="absolute top-2.5 right-2.5">
