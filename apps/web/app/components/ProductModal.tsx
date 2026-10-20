@@ -23,6 +23,18 @@ const TOPPINGS: Array<{ id: string; label: string; extra: number }> = [
   { id: 'thach', label: 'Thạch sương sáo', extra: 5000 },
 ];
 
+const resolveDrinkImage = (name: string, imageUrl?: string | null): string => {
+  if (imageUrl && imageUrl.trim().length > 0) return imageUrl;
+  const n = name.toLowerCase();
+  if (n.includes('sữa') || n.includes('sua')) return '/drinks/ca-phe-sua-da.jpg';
+  if (n.includes('đào') || n.includes('dao')) return '/drinks/tra-dao-cam-sa.jpg';
+  if (n.includes('americano')) return '/drinks/americano.jpg';
+  if (n.includes('cappuccino')) return '/drinks/cappuccino.jpg';
+  if (n.includes('bạc xỉu') || n.includes('bac xiu')) return '/drinks/bac-xiu.jpg';
+  if (n.includes('sen')) return '/drinks/tra-sen-vang.jpg';
+  return '/drinks/ca-phe-sua-da.jpg';
+};
+
 export const ProductModal: React.FC<ProductModalProps> = ({
   product,
   onClose,
@@ -64,13 +76,17 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       <div className="bg-stone-900 border border-stone-800 rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl text-stone-100 flex flex-col max-h-[92vh]">
         {/* Header with image */}
         <div className="relative h-44 sm:h-48 w-full bg-stone-800 shrink-0">
-          {product.imageUrl && (
-            <img
-              src={product.imageUrl}
-              alt={product.name}
-              className="w-full h-full object-cover"
-            />
-          )}
+          <img
+            src={resolveDrinkImage(product.name, product.imageUrl)}
+            alt={product.name}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              const fallback = resolveDrinkImage(product.name, null);
+              if (e.currentTarget.src !== fallback) {
+                e.currentTarget.src = fallback;
+              }
+            }}
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/30 to-black/40" />
 
           <button

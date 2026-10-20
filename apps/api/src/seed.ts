@@ -30,47 +30,61 @@ async function seed() {
     },
   });
 
-  // 1. Seed Products (Hình ảnh chuẩn đẹp cho menu)
+  // 1. Seed Products (Hình ảnh chuẩn đẹp từ /drinks/ nội bộ)
   const products = [
     {
       name: 'Cà phê sữa đá',
       price: 35000,
-      imageUrl: 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=600&auto=format&fit=crop&q=80',
+      imageUrl: '/drinks/ca-phe-sua-da.jpg',
+      stock: 50,
+      version: 0,
+    },
+    {
+      name: 'Cà phê sữa',
+      price: 35000,
+      imageUrl: '/drinks/ca-phe-sua-da.jpg',
       stock: 50,
       version: 0,
     },
     {
       name: 'Americano',
       price: 40000,
-      imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600&auto=format&fit=crop&q=80',
+      imageUrl: '/drinks/americano.jpg',
       stock: 50,
       version: 0,
     },
     {
       name: 'Cappuccino',
       price: 45000,
-      imageUrl: 'https://images.unsplash.com/photo-1534778101976-62847782c213?w=600&auto=format&fit=crop&q=80',
+      imageUrl: '/drinks/cappuccino.jpg',
       stock: 50,
       version: 0,
     },
     {
       name: 'Trà đào cam sả',
       price: 39000,
-      imageUrl: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=600&auto=format&fit=crop&q=80',
+      imageUrl: '/drinks/tra-dao-cam-sa.jpg',
+      stock: 50,
+      version: 0,
+    },
+    {
+      name: 'Trà đào',
+      price: 39000,
+      imageUrl: '/drinks/tra-dao-cam-sa.jpg',
       stock: 50,
       version: 0,
     },
     {
       name: 'Bạc xỉu Sài Gòn',
       price: 38000,
-      imageUrl: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&auto=format&fit=crop&q=80',
+      imageUrl: '/drinks/bac-xiu.jpg',
       stock: 50,
       version: 0,
     },
     {
       name: 'Trà sen vàng macchiato',
       price: 48000,
-      imageUrl: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=600&auto=format&fit=crop&q=80',
+      imageUrl: '/drinks/tra-sen-vang.jpg',
       stock: 50,
       version: 0,
     },
