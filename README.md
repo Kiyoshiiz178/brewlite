@@ -12,21 +12,30 @@ Bài tập lớn môn Công nghệ Phần mềm (Học kỳ I - Năm học 2026-
 
 ---
 
-## 2. Danh sách Task hoàn thành
+## 2. Phân công trách nhiệm & Danh sách Task hoàn thành
 
+### 2.1. Phân vai 3 cặp thành viên trong nhóm
+- **Cặp 1 — Backend Core & Database**: **Tuân** & **Quân**
+  - Phụ trách cấu trúc API backend (NestJS), thiết kế cơ sở dữ liệu PostgreSQL, migration Prisma, API sản phẩm và API tạo đơn hàng (Task 1, Task 2, Task 6).
+- **Cặp 2 — Frontend, Menu & Giỏ hàng**: **Trung** & **Tài**
+  - Phụ trách giao diện người dùng Next.js, hiển thị lưới menu, chi tiết món tùy chọn size/topping, giỏ hàng CartProvider và bộ test frontend Vitest (Task 1, Task 3, Task 4, Task 5).
+- **Cặp 3 — Nghiệp vụ, Thanh toán & Scrum**: **Tâm** & **Thịnh**
+  - Phụ trách xác thực JWT/bcrypt, thanh toán không tiền mặt mock gateway, màn hình xác nhận/lịch sử, State machine, tồn kho đồng thời, Docker Compose và quản lý Scrum (Task 7, Task 8, Task 9, Task 10).
+
+### 2.2. Danh sách 10 Task Scrum
 
 | Task | Tên Task | Người phụ trách | Mô tả & Tiêu chí nghiệm thu | Trạng thái |
 |---|---|---|---|---|
-| **Task 1** | Khởi tạo dự án và cấu trúc | Người 1, Người 4 | Monorepo Next.js + NestJS + Docker Compose + Git | ✅ Hoàn thành |
-| **Task 2** | API danh sách sản phẩm | Người 1, Người 4 | `GET /products`, `GET /products/:id` từ PostgreSQL | ✅ Hoàn thành |
-| **Task 3** | Trang Menu (Frontend) | Frontend Team | Next.js render lưới đồ uống, loading/empty states | ✅ Hoàn thành |
-| **Task 4** | Chi tiết & tùy chọn sản phẩm | Frontend Team | Chọn size (S/M/L), topping (Trân châu, Kem cheese, Thạch), tính giá động | ✅ Hoàn thành |
-| **Task 5** | Giỏ hàng (Cart) | Frontend Team | Thêm, sửa số lượng, xóa món, lưu trạng thái giỏ, badge đếm số lượng | ✅ Hoàn thành |
-| **Task 6** | API tạo đơn hàng | Người 1, Người 4 | `POST /orders`, validate class-validator, lưu trạng thái PENDING | ✅ Hoàn thành |
-| **Task 7** | Đăng ký / Đăng nhập (JWT) | Auth/Business | `POST /auth/register`, `POST /auth/login`, băm bcrypt, cấp JWT, bảo vệ route đơn hàng | ✅ Hoàn thành |
-| **Task 8** | Thanh toán không tiền mặt | Auth/Business | `POST /payments`, chọn Ví điện tử / Thẻ, chuyển `PAID` khi thành công, `PAYMENT_FAILED` khi lỗi | ✅ Hoàn thành |
-| **Task 9** | Xác nhận, lịch sử đơn & bàn giao | Toàn đội | Màn hình xác nhận mã đơn (#1042), `GET /orders/me`, Docker Compose 3 services | ✅ Hoàn thành |
-| **Task 10**| Nghiệp vụ Backend nâng cao | Toàn đội | Order State Machine, Idempotent Payment, Optimistic Locking tồn kho, Loyalty Points | ✅ Hoàn thành |
+| **Task 1** | Khởi tạo dự án và cấu trúc | Cả nhóm (Tuân, Quân, Trung, Tài, Tâm, Thịnh) | Monorepo Next.js + NestJS + Docker Compose + Git | ✅ Hoàn thành |
+| **Task 2** | API danh sách sản phẩm | Tuân, Quân | `GET /products`, `GET /products/:id` từ PostgreSQL | ✅ Hoàn thành |
+| **Task 3** | Trang Menu (Frontend) | Trung, Tài | Next.js render lưới đồ uống, loading/empty states | ✅ Hoàn thành |
+| **Task 4** | Chi tiết & tùy chọn sản phẩm | Trung, Tài | Chọn size (S/M/L), topping (Trân châu, Kem cheese, Thạch), tính giá động | ✅ Hoàn thành |
+| **Task 5** | Giỏ hàng (Cart) | Trung, Tài | Thêm, sửa số lượng, xóa món, lưu trạng thái giỏ, badge đếm số lượng | ✅ Hoàn thành |
+| **Task 6** | API tạo đơn hàng | Tuân, Quân | `POST /orders`, validate class-validator, lưu trạng thái PENDING | ✅ Hoàn thành |
+| **Task 7** | Đăng ký / Đăng nhập (JWT) | Tâm, Thịnh | `POST /auth/register`, `POST /auth/login`, băm bcrypt, cấp JWT, bảo vệ route đơn hàng | ✅ Hoàn thành |
+| **Task 8** | Thanh toán không tiền mặt | Tâm, Thịnh | `POST /payments`, chọn Ví điện tử / Thẻ, chuyển `PAID` khi thành công, `PAYMENT_FAILED` khi lỗi | ✅ Hoàn thành |
+| **Task 9** | Xác nhận, lịch sử đơn & bàn giao | Tâm, Thịnh (Toàn đội) | Màn hình xác nhận mã đơn (#1042), `GET /orders/me`, Docker Compose 3 services | ✅ Hoàn thành |
+| **Task 10**| Nghiệp vụ Backend nâng cao | Tâm, Thịnh | Order State Machine, Idempotent Payment, Optimistic Locking tồn kho, Loyalty Points | ✅ Hoàn thành |
 
 ---
 
@@ -126,27 +135,44 @@ npm run dev
 
 ## 6. Chạy Test Suites (Minh chứng tiêu chí kiểm thử)
 
-Hệ thống bao gồm bộ test kiểm thử tự động toàn diện với Vitest gồm 8 suites (42 test cases):
+Hệ thống bao gồm bộ test kiểm thử tự động toàn diện với Vitest cho cả Backend và Frontend gồm **13 suites (81 test cases)**:
+
+### 6.1. Backend API (NestJS) – 8 suites (42 test cases)
 ```bash
 cd apps/api
 npm run test
 ```
 
-### Danh sách các bộ Unit & Integration Tests:
-1. **API Sản phẩm (Task 2 - Người 1 & Người 4)**:
+**Danh sách các bộ Unit & Integration Tests Backend:**
+1. **API Sản phẩm (Task 2 - Tuân, Quân)**:
    - `src/products/products.service.spec.ts`: Test `findAll`, `findOne` (thành công và ném 404), `create`, `update`, `remove`.
    - `src/products/products.controller.spec.ts`: Test controller endpoints với `ParseIntPipe`.
-2. **API Đặt hàng & Giỏ hàng (Task 6 - Người 1 & Người 4)**:
+2. **API Đặt hàng & Giỏ hàng (Task 6 - Tuân, Quân)**:
    - `src/orders/orders.service.spec.ts`: Test tạo đơn `PENDING`, tính giá động size/topping, áp mã voucher, kiểm tra tồn kho, phát hiện xung đột optimistic locking, ném lỗi 400/404 khi vi phạm, lịch sử `findMyOrders`, cập nhật trạng thái `updateStatus`.
    - `src/orders/orders.controller.spec.ts`: Test controller bảo vệ bởi `JwtAuthGuard`.
-3. **API Xác thực (Task 7)**:
+3. **API Xác thực (Task 7 - Tâm, Thịnh)**:
    - `src/auth/auth.service.spec.ts` & `src/auth/auth.controller.spec.ts`: Test đăng ký, đăng nhập bcrypt, phát token JWT.
-4. **Nghiệp vụ nâng cao (Task 10 & DoD)**:
+4. **Nghiệp vụ nâng cao (Task 10 & DoD - Tâm, Thịnh)**:
    - `test/task10.spec.ts`:
      - `(a)` Chặn thành công mọi chuyển trạng thái sai (`assertTransition`).
      - `(b)` Gửi lặp lại cùng `Idempotency-Key` chỉ tạo 1 bản ghi payment và không nhân đôi điểm loyalty.
      - `(c)` Đặt đơn đồng thời không bao giờ vượt quá số lượng tồn kho (Optimistic Locking).
      - `(d)` Áp mã giảm giá và tích lũy điểm thưởng chính xác.
+
+### 6.2. Frontend Web (Next.js) – 5 suites (39 test cases)
+```bash
+cd apps/web
+npm install
+npm run test
+```
+
+**Danh sách các bộ Unit & Component Tests Frontend:**
+5. **Menu, Tùy chọn món & Giỏ hàng (Task 3, 4, 5 - Trung, Tài)** (Vitest + React Testing Library):
+   - `__tests__/pricing.test.ts`: Giá size/topping khớp cách tính của server (M +5k, L +10k, mỗi topping +5k).
+   - `__tests__/cart.test.ts`: Thêm/gộp dòng, sửa số lượng, xóa, không vượt tồn kho, tổng tiền, đọc giỏ đã lưu.
+   - `__tests__/ProductModal.test.tsx`: Chọn size/topping, giá đổi theo, giới hạn tồn kho, đặt lại khi đổi sản phẩm.
+   - `__tests__/CartDrawer.test.tsx`: Giỏ trống, hiển thị topping, tăng/giảm/xóa, nút thanh toán.
+   - `__tests__/MenuPage.test.tsx`: Trạng thái loading/empty/error của Menu và luồng menu → chi tiết → giỏ hàng (lưu khi F5).
 
 ---
 
