@@ -2,12 +2,14 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { Coffee, Sparkles, AlertCircle, ArrowRight } from 'lucide-react';
-import { Product, CartItem, UserProfile } from './types';
+import { Product, UserProfile } from './types';
+import type { NewCartItem } from './lib/cart';
 import { fetchProducts, fetchUserProfile } from './lib/api';
 import { Navbar } from './components/Navbar';
 import { ProductCard } from './components/ProductCard';
 import { ProductModal } from './components/ProductModal';
 import { CartDrawer } from './components/CartDrawer';
+import { useCart } from './components/CartProvider';
 import { AuthModal } from './components/AuthModal';
 import { CheckoutModal } from './components/CheckoutModal';
 import { OrderConfirmationModal } from './components/OrderConfirmationModal';
@@ -27,20 +29,8 @@ export default function Home() {
   });
   const [user, setUser] = useState<UserProfile | null>(null);
 
-  // Cart State (Task 5)
-  const [cart, setCart] = useState<CartItem[]>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('brewlite_cart');
-      if (saved) {
-        try {
-          return JSON.parse(saved);
-        } catch {
-          return [];
-        }
-      }
-    }
-    return [];
-  });
+  // Cart State (Task 5): giỏ hàng nằm trong CartProvider (React Context, lưu localStorage)
+  const { items: cart, count: totalCartCount, addItem, changeQty, removeItem, clear, qtyInCart } = useCart();
 
   // Navigation & Modals
   const [activeTab, setActiveTab] = useState<'menu' | 'history'>('menu');
@@ -101,47 +91,22 @@ export default function Home() {
     };
   }, [token]);
 
-  // Save cart to local storage
-  useEffect(() => {
-    localStorage.setItem('brewlite_cart', JSON.stringify(cart));
-  }, [cart]);
-
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 4000);
   };
 
   // Cart actions
-  const handleAddToCart = (itemData: Omit<CartItem, 'id'>) => {
-    const newItem: CartItem = {
-      ...itemData,
-      id: `cart-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
-    };
-    setCart((prev) => [...prev, newItem]);
-    showToast(`Đã thêm "${itemData.product.name}" vào giỏ hàng`);
-  };
-
-  const handleUpdateQty = (id: string, delta: number) => {
-    setCart((prev) =>
-      prev
-        .map((item) => {
-          if (item.id === id) {
-            const newQty = item.qty + delta;
-            if (newQty <= 0) return null;
-            return {
-              ...item,
-              qty: newQty,
-              lineTotal: item.unitPrice * newQty,
-            };
-          }
-          return item;
-        })
-        .filter(Boolean) as CartItem[],
-    );
-  };
-
-  const handleRemoveItem = (id: string) => {
-    setCart((prev) => prev.filter((i) => i.id !== id));
+  const handleAddToCart = (itemData: NewCartItem) => {
+    const name = itemData.product.name;
+    const added = addItem(itemData);
+    if (added <= 0) {
+      showToast(`Giỏ hàng đã có đủ số ly "${name}" còn trong kho`);
+    } else if (added < itemData.qty) {
+      showToast(`Chỉ thêm được ${added} ly "${name}" do giới hạn tồn kho`);
+    } else {
+      showToast(`Đã thêm "${name}" vào giỏ hàng`);
+    }
   };
 
   // Auth actions
@@ -177,8 +142,7 @@ export default function Home() {
     pointsEarned?: number,
   ) => {
     // Clear cart on successful payment
-    setCart([]);
-    localStorage.removeItem('brewlite_cart');
+    clear();
 
     // Refresh user profile to show updated loyalty points (Task 10.4)
     if (token) {
@@ -199,8 +163,6 @@ export default function Home() {
       loadProducts();
     }
   };
-
-  const totalCartCount = cart.reduce((acc, item) => acc + item.qty, 0);
 
   return (
     <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col font-sans selection:bg-amber-500 selection:text-stone-950">
@@ -316,8 +278,8 @@ export default function Home() {
                     />
                   ))}
                 </div>
-              ) : products.length === 0 ? (
-                /* Empty state */
+              ) : error ? null : products.length === 0 ? (
+                /* Empty state (chỉ khi tải thành công nhưng menu trống) */
                 <div className="text-center py-16 bg-stone-900/50 border border-stone-800 rounded-3xl p-6">
                   <Coffee className="w-12 h-12 text-stone-700 mx-auto mb-3" />
                   <p className="text-base font-bold text-stone-300">
@@ -358,6 +320,7 @@ export default function Home() {
       {/* Modals & Drawers */}
       <ProductModal
         product={selectedProduct}
+        inCartQty={selectedProduct ? qtyInCart(selectedProduct.id) : 0}
         onClose={() => setSelectedProduct(null)}
         onAddToCart={handleAddToCart}
       />
@@ -366,8 +329,8 @@ export default function Home() {
         isOpen={isCartOpen}
         items={cart}
         onClose={() => setIsCartOpen(false)}
-        onUpdateQty={handleUpdateQty}
-        onRemoveItem={handleRemoveItem}
+        onUpdateQty={changeQty}
+        onRemoveItem={removeItem}
         onCheckout={handleProceedToCheckout}
       />
 
