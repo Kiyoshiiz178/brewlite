@@ -22,6 +22,12 @@ interface CheckoutModalProps {
   onClose: () => void;
   onSuccess: (orderId: number, status: string, pointsEarned?: number) => void;
   onErrorState: (message: string) => void;
+  onProceedToGateway?: (data: {
+    orderId: number;
+    amount: number;
+    method: 'WALLET' | 'CARD';
+    idempotencyKey: string;
+  }) => void;
 }
 
 export const CheckoutModal: React.FC<CheckoutModalProps> = ({
@@ -31,6 +37,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   onClose,
   onSuccess,
   onErrorState,
+  onProceedToGateway,
 }) => {
   const [method, setMethod] = useState<'WALLET' | 'CARD'>('WALLET');
   const [promoInput, setPromoInput] = useState('');
@@ -88,7 +95,19 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       // 2. Tạo Idempotency-Key duy nhất cho lần thanh toán này (Task 10.2)
       const idempotencyKey = `pay-${orderRes.orderId}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
-      // 3. Gọi POST /payments xử lý thanh toán (Task 8)
+      // 3. Nếu có Mock Gateway bên thứ 3 -> Chuyển hướng sang cổng thanh toán giả lập
+      if (onProceedToGateway) {
+        onProceedToGateway({
+          orderId: orderRes.orderId,
+          amount: orderRes.total,
+          method,
+          idempotencyKey,
+        });
+        onClose();
+        return;
+      }
+
+      // Fallback: Gọi POST /payments trực tiếp nếu không dùng Gateway Modal
       const paymentRes = await processPayment({
         orderId: orderRes.orderId,
         idempotencyKey,

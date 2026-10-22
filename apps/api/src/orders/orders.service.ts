@@ -149,6 +149,27 @@ export class OrdersService {
     });
   }
 
+  async findAll() {
+    return this.prisma.order.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+        },
+        payments: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            loyaltyPoints: true,
+          },
+        },
+      },
+    });
+  }
+
   async findOne(id: number) {
     const order = await this.prisma.order.findUnique({
       where: { id },

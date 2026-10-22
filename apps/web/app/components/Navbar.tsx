@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { Coffee, ShoppingBag, User, LogOut, Award, Clock } from 'lucide-react';
 import { UserProfile } from '../types';
 
@@ -68,7 +69,17 @@ export const Navbar: React.FC<NavbarProps> = ({
         </nav>
 
         {/* Actions */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2 sm:space-x-3">
+          {/* Quick Barista / Admin link */}
+          <Link
+            href="/admin"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-stone-800/90 hover:bg-stone-800 border border-stone-700/80 text-xs font-bold text-amber-400 hover:text-amber-300 transition shadow-sm"
+            title="Mở bảng điều phối Barista & Quản lý quầy"
+          >
+            <Coffee className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Quầy Barista</span>
+          </Link>
+
           {/* User profile & loyalty points */}
           {user ? (
             <div className="flex items-center space-x-2 bg-stone-800/90 border border-stone-700 rounded-xl px-3 py-1.5">
