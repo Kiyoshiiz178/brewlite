@@ -31,6 +31,7 @@ export interface OrderItem {
   qty: number;
   lineTotal: number;
   product?: Product;
+  toppings?: string[];
 }
 
 export interface PaymentRecord {
@@ -49,4 +50,23 @@ export interface Order {
   createdAt: string;
   items: OrderItem[];
   payments?: PaymentRecord[];
+  user?: {
+    id: number;
+    email: string;
+    loyaltyPoints?: number;
+  } | null;
 }
+
+export interface PaymentAuditRecord {
+  id: number;
+  orderId: number;
+  idempotencyKey: string;
+  amount: number;
+  method: string;
+  order?: {
+    id: number;
+    status: string;
+    user?: { id: number; email: string } | null;
+  };
+}
+

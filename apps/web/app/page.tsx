@@ -12,6 +12,7 @@ import { CartDrawer } from './components/CartDrawer';
 import { useCart } from './components/CartProvider';
 import { AuthModal } from './components/AuthModal';
 import { CheckoutModal } from './components/CheckoutModal';
+import { MockPaymentGatewayModal } from './components/MockPaymentGatewayModal';
 import { OrderConfirmationModal } from './components/OrderConfirmationModal';
 import { OrderHistoryView } from './components/OrderHistoryView';
 
@@ -39,6 +40,14 @@ export default function Home() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Third-party Payment Gateway simulation state
+  const [gatewayData, setGatewayData] = useState<{
+    orderId: number;
+    amount: number;
+    method: 'WALLET' | 'CARD';
+    idempotencyKey: string;
+  } | null>(null);
 
   // Confirmation screen state (Task 9)
   const [confirmationData, setConfirmationData] = useState<{
@@ -345,6 +354,18 @@ export default function Home() {
         items={cart}
         token={token}
         onClose={() => setIsCheckoutOpen(false)}
+        onProceedToGateway={(data) => setGatewayData(data)}
+        onSuccess={handlePaymentSuccess}
+        onErrorState={handlePaymentError}
+      />
+
+      <MockPaymentGatewayModal
+        isOpen={!!gatewayData}
+        orderId={gatewayData?.orderId || null}
+        amount={gatewayData?.amount || 0}
+        method={gatewayData?.method || 'WALLET'}
+        idempotencyKey={gatewayData?.idempotencyKey || ''}
+        onClose={() => setGatewayData(null)}
         onSuccess={handlePaymentSuccess}
         onErrorState={handlePaymentError}
       />

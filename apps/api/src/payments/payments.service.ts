@@ -3,7 +3,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { CreatePaymentDto } from './dto/create-payment.dto.js';
+import { CreatePaymentDto, MockWebhookDto } from './dto/create-payment.dto.js';
 import { OrderStatus, assertTransition } from '../orders/order-state-machine.js';
 
 export interface ProcessPaymentResult {
@@ -133,5 +133,34 @@ export class PaymentsService {
     return this.prisma.payment.findMany({
       where: { orderId },
     });
+  }
+
+  async findAllPayments() {
+    return this.prisma.payment.findMany({
+      orderBy: { id: 'desc' },
+      include: {
+        order: {
+          include: {
+            user: { select: { id: true, email: true } },
+          },
+        },
+      },
+    });
+  }
+
+  async handleWebhook(dto: MockWebhookDto) {
+    const result = await this.processPayment({
+      orderId: dto.orderId,
+      idempotencyKey: dto.idempotencyKey,
+      amount: dto.amount,
+      method: dto.method,
+      mockFailed: dto.status === 'FAILED',
+    });
+
+    return {
+      received: true,
+      gatewayRef: dto.gatewayRef || `GW-${Date.now()}`,
+      ...result,
+    };
   }
 }

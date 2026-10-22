@@ -112,3 +112,56 @@ export async function validatePromotion(code: string): Promise<{ valid: boolean;
   }
   return data;
 }
+
+export async function fetchAllOrders(): Promise<Order[]> {
+  const res = await fetch(`${API_URL}/orders`, { cache: 'no-store' });
+  if (!res.ok) throw new Error('Không thể tải danh sách tất cả đơn hàng');
+  return res.json();
+}
+
+export async function updateOrderStatus(orderId: number, status: string): Promise<Order> {
+  const res = await fetch(`${API_URL}/orders/${orderId}/status`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || `Không thể cập nhật trạng thái đơn #${orderId}`);
+  }
+  return data;
+}
+
+export async function sendPaymentWebhook(payload: {
+  orderId: number;
+  idempotencyKey: string;
+  amount: number;
+  method: string;
+  status: 'SUCCESS' | 'FAILED';
+  gatewayRef?: string;
+}): Promise<{
+  success: boolean;
+  status: string;
+  paymentId?: number;
+  pointsEarned?: number;
+  message: string;
+  gatewayRef?: string;
+}> {
+  const res = await fetch(`${API_URL}/payments/webhook`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || 'Xử lý phản hồi từ cổng thanh toán thất bại');
+  }
+  return data;
+}
+
+export async function fetchAllPayments() {
+  const res = await fetch(`${API_URL}/payments`, { cache: 'no-store' });
+  if (!res.ok) throw new Error('Không thể tải nhật ký thanh toán');
+  return res.json();
+}
+
