@@ -10,7 +10,6 @@ import {
   Loader2,
   Check,
   ShieldCheck,
-  AlertTriangle,
 } from 'lucide-react';
 import { CartItem } from '../types';
 import { createOrder, processPayment, validatePromotion } from '../lib/api';
@@ -44,7 +43,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [appliedPromo, setAppliedPromo] = useState<{ code: string; discountPct: number } | null>(null);
   const [promoError, setPromoError] = useState<string | null>(null);
   const [isApplyingPromo, setIsApplyingPromo] = useState(false);
-  const [mockFailed, setMockFailed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -113,7 +111,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         idempotencyKey,
         amount: orderRes.total,
         method,
-        mockFailed,
       });
 
       if (!paymentRes.success || paymentRes.status === 'PAYMENT_FAILED') {
@@ -227,13 +224,14 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           )}
         </div>
 
-        {/* Payment Methods (Task 8 & wireframe screen 4) */}
+        {/* Payment Methods */}
         <div className="mb-5">
           <label className="text-xs font-semibold text-stone-400 mb-2 block">
             Phương thức thanh toán
           </label>
           <div className="grid grid-cols-2 gap-3">
             <button
+              type="button"
               onClick={() => setMethod('WALLET')}
               className={`p-3.5 rounded-2xl border flex flex-col items-center gap-2 transition ${
                 method === 'WALLET'
@@ -249,6 +247,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             </button>
 
             <button
+              type="button"
               onClick={() => setMethod('CARD')}
               className={`p-3.5 rounded-2xl border flex flex-col items-center gap-2 transition ${
                 method === 'CARD'
@@ -263,23 +262,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               </div>
             </button>
           </div>
-        </div>
-
-        {/* Mock Failure Switch for Testing/Grading requirement */}
-        <div className="mb-5 p-3 rounded-xl bg-amber-950/20 border border-amber-900/40 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-            <div>
-              <span className="text-xs font-semibold text-amber-200">Mô phỏng lỗi thanh toán</span>
-              <p className="text-[10px] text-stone-400">Dành cho việc kiểm thử luồng PAYMENT_FAILED</p>
-            </div>
-          </div>
-          <input
-            type="checkbox"
-            checked={mockFailed}
-            onChange={(e) => setMockFailed(e.target.checked)}
-            className="w-4 h-4 accent-amber-500 cursor-pointer"
-          />
         </div>
 
         {/* Submit */}

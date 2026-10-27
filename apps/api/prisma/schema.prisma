@@ -15,6 +15,27 @@ model Product {
   stock       Int         @default(0)
   version     Int         @default(0)
   orderItems  OrderItem[]
+  recipes     RecipeItem[]
+}
+
+model Ingredient {
+  id            Int          @id @default(autoincrement())
+  name          String       @unique
+  unit          String       // 'g', 'ml', 'phần', v.v.
+  stock         Int          @default(0)
+  minStockAlert Int          @default(100)
+  recipes       RecipeItem[]
+}
+
+model RecipeItem {
+  id           Int        @id @default(autoincrement())
+  productId    Int
+  ingredientId Int
+  amount       Int        // Lượng nguyên liệu cần cho 1 ly
+  product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, ingredientId])
 }
 
 model User {
