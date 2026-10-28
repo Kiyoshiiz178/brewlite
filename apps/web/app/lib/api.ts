@@ -244,5 +244,48 @@ export async function recalculateAllStock(): Promise<unknown> {
   return resData;
 }
 
+export async function createVnpayUrl(
+  orderId: number,
+  bankCode?: string,
+): Promise<{ paymentUrl: string; orderId: number; amount: number }> {
+  const res = await fetch(`${API_URL}/payments/vnpay-url`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ orderId, bankCode }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || 'Không thể tạo liên kết thanh toán VNPay');
+  }
+  return data;
+}
+
+export async function verifyVnpayReturn(
+  queryString: string,
+): Promise<{
+  success: boolean;
+  orderId: number;
+  amount: number;
+  transactionNo?: string;
+  bankCode?: string;
+  message: string;
+  status?: string;
+  responseCode?: string;
+}> {
+  const res = await fetch(`${API_URL}/payments/vnpay-verify?${queryString}`);
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || 'Xác thực thanh toán VNPay thất bại');
+  }
+  return data;
+}
+
+export async function fetchOrderById(orderId: number): Promise<Order> {
+  const res = await fetch(`${API_URL}/orders/${orderId}`, { cache: 'no-store' });
+  if (!res.ok) throw new Error('Không thể tải thông tin đơn hàng');
+  return res.json();
+}
+
+
 
 

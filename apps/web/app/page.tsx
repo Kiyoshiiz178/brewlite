@@ -12,6 +12,7 @@ import { CartDrawer } from './components/CartDrawer';
 import { useCart } from './components/CartProvider';
 import { AuthModal } from './components/AuthModal';
 import { CheckoutModal } from './components/CheckoutModal';
+import { VietQrModal } from './components/VietQrModal';
 import { MockPaymentGatewayModal } from './components/MockPaymentGatewayModal';
 import { OrderConfirmationModal } from './components/OrderConfirmationModal';
 import { OrderHistoryView } from './components/OrderHistoryView';
@@ -40,6 +41,9 @@ export default function Home() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // VietQR Real Banking App Modal State
+  const [vietQrData, setVietQrData] = useState<{ orderId: number; amount: number } | null>(null);
 
   // Third-party Payment Gateway simulation state
   const [gatewayData, setGatewayData] = useState<{
@@ -354,9 +358,18 @@ export default function Home() {
         items={cart}
         token={token}
         onClose={() => setIsCheckoutOpen(false)}
+        onOpenVietQr={(orderId, amount) => setVietQrData({ orderId, amount })}
         onProceedToGateway={(data) => setGatewayData(data)}
         onSuccess={handlePaymentSuccess}
         onErrorState={handlePaymentError}
+      />
+
+      <VietQrModal
+        isOpen={!!vietQrData}
+        orderId={vietQrData?.orderId || null}
+        amount={vietQrData?.amount || 0}
+        onClose={() => setVietQrData(null)}
+        onSuccess={handlePaymentSuccess}
       />
 
       <MockPaymentGatewayModal

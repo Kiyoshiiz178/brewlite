@@ -21,8 +21,8 @@ export class CreatePaymentDto {
   amount!: number;
 
   @IsString({ message: 'method phải là chuỗi' })
-  @IsIn(['WALLET', 'CARD'], {
-    message: 'method phải là WALLET (Ví điện tử) hoặc CARD (Thẻ ngân hàng)',
+  @IsIn(['WALLET', 'CARD', 'VNPAY', 'VIETQR', 'SEPAY'], {
+    message: 'method phải là một trong các phương thức hợp lệ (WALLET, CARD, VNPAY, VIETQR, SEPAY)',
   })
   method!: string;
 
@@ -44,8 +44,8 @@ export class MockWebhookDto {
   amount!: number;
 
   @IsString({ message: 'method phải là chuỗi' })
-  @IsIn(['WALLET', 'CARD'], {
-    message: 'method phải là WALLET hoặc CARD',
+  @IsIn(['WALLET', 'CARD', 'VNPAY', 'VIETQR', 'SEPAY'], {
+    message: 'method không hợp lệ',
   })
   method!: string;
 

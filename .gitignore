@@ -7,3 +7,6 @@ dist/
 .DS_Store
 apps/api/src/generated/
 *.tsbuildinfo
+cloudflared.exe
+tunnel.cjs
+
