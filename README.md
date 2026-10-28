@@ -185,3 +185,16 @@ npm run test
 6. **Thử nghiệm thanh toán lỗi**: Tích chọn "Mô phỏng lỗi thanh toán" -> Nhấn xác nhận -> Đơn chuyển `PAYMENT_FAILED`, giỏ hàng được giữ nguyên.
 7. **Thanh toán thành công**: Bỏ chọn lỗi -> Nhấn xác nhận -> Đơn chuyển `PAID`, nhận mã đơn `#...`, thông báo "Mời tới quầy lấy nước", nhận điểm thưởng loyalty.
 8. **Xem Lịch sử đơn**: Chuyển sang tab "Lịch sử đơn" -> Quan sát timeline tiến trình trạng thái và điểm tích lũy vừa được cộng.
+9. **Tài khoản demo thanh toán**: 
+    Tài khoản Demo:
+    - Email: [EMAIL_ADDRESS]
+    - Password: [PASSWORD]
+
+    Để thanh toán thử nghiệm:
+    - Chọn phương thức: VNPay
+    - Thẻ tín dụng: 9704198526191432198
+    - Tên chủ thẻ: NGUYEN VAN A
+    - Ngày hết hạn: 07/15
+    - OTP: 123456
+    - Sau đó bấm "Thanh toán" và làm theo hướng dẫn của VNPay Sandbox.    
+

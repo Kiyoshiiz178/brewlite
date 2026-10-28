@@ -47,10 +47,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onSelect }) =
         <div className="absolute top-2.5 right-2.5">
           {isOutOfStock ? (
             <span className="px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider rounded-lg bg-rose-500/90 text-white backdrop-blur-sm shadow">
-              Hết hàng
+              Tạm hết món
             </span>
           ) : (
-            <span className="px-2.5 py-1 text-[11px] font-medium rounded-lg bg-stone-950/75 text-amber-300 backdrop-blur-sm border border-stone-800">
+            <span className="px-2.5 py-1 text-[11px] font-medium rounded-lg bg-stone-950/80 text-amber-300 backdrop-blur-sm border border-amber-500/30 flex items-center gap-1.5 shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
               Còn {product.stock} ly
             </span>
           )}

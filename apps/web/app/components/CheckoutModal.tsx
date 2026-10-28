@@ -10,10 +10,10 @@ import {
   Loader2,
   Check,
   ShieldCheck,
-  AlertTriangle,
+  QrCode,
 } from 'lucide-react';
 import { CartItem } from '../types';
-import { createOrder, processPayment, validatePromotion } from '../lib/api';
+import { createOrder, processPayment, validatePromotion, createVnpayUrl } from '../lib/api';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -22,6 +22,7 @@ interface CheckoutModalProps {
   onClose: () => void;
   onSuccess: (orderId: number, status: string, pointsEarned?: number) => void;
   onErrorState: (message: string) => void;
+  onOpenVietQr?: (orderId: number, amount: number) => void;
   onProceedToGateway?: (data: {
     orderId: number;
     amount: number;
@@ -37,14 +38,14 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   onClose,
   onSuccess,
   onErrorState,
+  onOpenVietQr,
   onProceedToGateway,
 }) => {
-  const [method, setMethod] = useState<'WALLET' | 'CARD'>('WALLET');
+  const [method, setMethod] = useState<'VIETQR' | 'VNPAY' | 'WALLET' | 'CARD'>('VIETQR');
   const [promoInput, setPromoInput] = useState('');
   const [appliedPromo, setAppliedPromo] = useState<{ code: string; discountPct: number } | null>(null);
   const [promoError, setPromoError] = useState<string | null>(null);
   const [isApplyingPromo, setIsApplyingPromo] = useState(false);
-  const [mockFailed, setMockFailed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -92,15 +93,32 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         token || undefined,
       );
 
-      // 2. Tạo Idempotency-Key duy nhất cho lần thanh toán này (Task 10.2)
-      const idempotencyKey = `pay-${orderRes.orderId}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+      // 2. Nếu chọn VietQR (App ngân hàng thật) -> Mở modal VietQR có SePay Webhook
+      if (method === 'VIETQR') {
+        if (onOpenVietQr) {
+          onOpenVietQr(orderRes.orderId, orderRes.total);
+        }
+        onClose();
+        return;
+      }
 
-      // 3. Nếu có Mock Gateway bên thứ 3 -> Chuyển hướng sang cổng thanh toán giả lập
+      // 3. Nếu chọn VNPay -> Tạo liên kết VNPay Sandbox và chuyển hướng ngay
+      if (method === 'VNPAY') {
+        const vnpayRes = await createVnpayUrl(orderRes.orderId);
+        window.location.href = vnpayRes.paymentUrl;
+        return;
+      }
+
+      // 4. Tạo Idempotency-Key duy nhất cho lần thanh toán này (Task 10.2)
+      const idempotencyKey = `pay-${orderRes.orderId}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+      const directMethod: 'WALLET' | 'CARD' = method === 'CARD' ? 'CARD' : 'WALLET';
+
+      // 5. Nếu có Mock Gateway bên thứ 3 -> Chuyển hướng sang cổng thanh toán giả lập
       if (onProceedToGateway) {
         onProceedToGateway({
           orderId: orderRes.orderId,
           amount: orderRes.total,
-          method,
+          method: directMethod,
           idempotencyKey,
         });
         onClose();
@@ -112,8 +130,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         orderId: orderRes.orderId,
         idempotencyKey,
         amount: orderRes.total,
-        method,
-        mockFailed,
+        method: directMethod,
       });
 
       if (!paymentRes.success || paymentRes.status === 'PAYMENT_FAILED') {
@@ -227,21 +244,97 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           )}
         </div>
 
-        {/* Payment Methods (Task 8 & wireframe screen 4) */}
-        <div className="mb-5">
-          <label className="text-xs font-semibold text-stone-400 mb-2 block">
+        {/* Payment Methods */}
+        <div className="mb-5 space-y-2.5">
+          <label className="text-xs font-semibold text-stone-400 block">
             Phương thức thanh toán
           </label>
+
+          {/* VietQR Button (Featured 1 - Real Banking App) */}
+          <button
+            type="button"
+            onClick={() => setMethod('VIETQR')}
+            className={`w-full p-3.5 rounded-2xl border flex items-center justify-between transition text-left ${
+              method === 'VIETQR'
+                ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold shadow-lg shadow-emerald-500/10'
+                : 'border-stone-800 bg-stone-800/40 text-stone-300 hover:border-stone-700'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-cyan-500 flex items-center justify-center text-white font-black text-[10px] shadow-md shrink-0 tracking-wider">
+                VIETQR
+              </div>
+              <div>
+                <div className="text-xs font-bold flex items-center gap-2">
+                  <span>Quét mã VietQR (App ngân hàng thật)</span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-medium">
+                    Tự động qua SePay
+                  </span>
+                </div>
+                <div className="text-[11px] text-stone-400 font-normal mt-0.5">
+                  Mở MBBank, VCB, Techcom... quét QR chuyển tiền, hệ thống tự động nhận
+                </div>
+              </div>
+            </div>
+            <div
+              className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ml-2 ${
+                method === 'VIETQR'
+                  ? 'border-emerald-400 bg-emerald-400 text-stone-950'
+                  : 'border-stone-600'
+              }`}
+            >
+              {method === 'VIETQR' && <Check className="w-3 h-3 stroke-[3]" />}
+            </div>
+          </button>
+
+          {/* VNPay Sandbox Button (Featured 2) */}
+          <button
+            type="button"
+            onClick={() => setMethod('VNPAY')}
+            className={`w-full p-3.5 rounded-2xl border flex items-center justify-between transition text-left ${
+              method === 'VNPAY'
+                ? 'border-amber-500 bg-amber-500/10 text-amber-400 font-bold shadow-lg shadow-amber-500/10'
+                : 'border-stone-800 bg-stone-800/40 text-stone-300 hover:border-stone-700'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-red-500 to-amber-500 flex items-center justify-center text-white font-black text-[11px] shadow-md shrink-0 tracking-wider">
+                VNPAY
+              </div>
+              <div>
+                <div className="text-xs font-bold flex items-center gap-2">
+                  <span>Cổng VNPay (Thẻ ATM / QR / Visa)</span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] bg-red-500/20 text-red-400 border border-red-500/30 font-medium">
+                    Sandbox Demo
+                  </span>
+                </div>
+                <div className="text-[11px] text-stone-400 font-normal mt-0.5">
+                  Chuyển hướng đến cổng VNPay thực tế để quét QR hoặc nhập thẻ test NCB
+                </div>
+              </div>
+            </div>
+            <div
+              className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ml-2 ${
+                method === 'VNPAY'
+                  ? 'border-amber-400 bg-amber-400 text-stone-950'
+                  : 'border-stone-600'
+              }`}
+            >
+              {method === 'VNPAY' && <Check className="w-3 h-3 stroke-[3]" />}
+            </div>
+          </button>
+
           <div className="grid grid-cols-2 gap-3">
             <button
+              type="button"
               onClick={() => setMethod('WALLET')}
-              className={`p-3.5 rounded-2xl border flex flex-col items-center gap-2 transition ${
+              className={`p-3 rounded-2xl border flex flex-col items-center gap-1.5 transition ${
                 method === 'WALLET'
                   ? 'border-amber-500 bg-amber-500/10 text-amber-400 font-bold shadow-md shadow-amber-500/10'
                   : 'border-stone-800 bg-stone-800/40 text-stone-400 hover:border-stone-700'
               }`}
             >
-              <Wallet className="w-6 h-6" />
+              <Wallet className="w-5 h-5" />
               <div className="text-xs font-medium text-center">
                 Ví điện tử
                 <span className="block text-[10px] text-stone-500">Momo / ZaloPay</span>
@@ -249,14 +342,15 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             </button>
 
             <button
+              type="button"
               onClick={() => setMethod('CARD')}
-              className={`p-3.5 rounded-2xl border flex flex-col items-center gap-2 transition ${
+              className={`p-3 rounded-2xl border flex flex-col items-center gap-1.5 transition ${
                 method === 'CARD'
                   ? 'border-amber-500 bg-amber-500/10 text-amber-400 font-bold shadow-md shadow-amber-500/10'
                   : 'border-stone-800 bg-stone-800/40 text-stone-400 hover:border-stone-700'
               }`}
             >
-              <CreditCard className="w-6 h-6" />
+              <CreditCard className="w-5 h-5" />
               <div className="text-xs font-medium text-center">
                 Thẻ ngân hàng
                 <span className="block text-[10px] text-stone-500">ATM / Visa / Master</span>
@@ -265,28 +359,15 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           </div>
         </div>
 
-        {/* Mock Failure Switch for Testing/Grading requirement */}
-        <div className="mb-5 p-3 rounded-xl bg-amber-950/20 border border-amber-900/40 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-            <div>
-              <span className="text-xs font-semibold text-amber-200">Mô phỏng lỗi thanh toán</span>
-              <p className="text-[10px] text-stone-400">Dành cho việc kiểm thử luồng PAYMENT_FAILED</p>
-            </div>
-          </div>
-          <input
-            type="checkbox"
-            checked={mockFailed}
-            onChange={(e) => setMockFailed(e.target.checked)}
-            className="w-4 h-4 accent-amber-500 cursor-pointer"
-          />
-        </div>
-
         {/* Submit */}
         <button
           onClick={handlePayment}
           disabled={loading}
-          className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-stone-950 font-bold text-sm shadow-xl shadow-amber-600/30 flex items-center justify-center gap-2 transition transform active:scale-95 disabled:opacity-50"
+          className={`w-full py-3.5 rounded-2xl font-bold text-sm shadow-xl flex items-center justify-center gap-2 transition transform active:scale-95 disabled:opacity-50 ${
+            method === 'VIETQR'
+              ? 'bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-stone-950 shadow-emerald-600/30'
+              : 'bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-stone-950 shadow-amber-600/30'
+          }`}
         >
           {loading ? (
             <>
@@ -295,8 +376,18 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             </>
           ) : (
             <>
-              <ShieldCheck className="w-4 h-4" />
-              <span>Xác nhận trả {finalTotal.toLocaleString('vi-VN')}đ</span>
+              {method === 'VIETQR' ? (
+                <QrCode className="w-4 h-4" />
+              ) : (
+                <ShieldCheck className="w-4 h-4" />
+              )}
+              <span>
+                {method === 'VIETQR'
+                  ? `Tạo mã VietQR (${finalTotal.toLocaleString('vi-VN')}đ)`
+                  : method === 'VNPAY'
+                  ? `Chuyển sang VNPay (${finalTotal.toLocaleString('vi-VN')}đ)`
+                  : `Xác nhận trả ${finalTotal.toLocaleString('vi-VN')}đ`}
+              </span>
             </>
           )}
         </button>
