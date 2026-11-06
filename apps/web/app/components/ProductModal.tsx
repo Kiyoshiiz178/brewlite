@@ -8,13 +8,19 @@ import type { NewCartItem } from '../lib/cart';
 import { SIZES, TOPPINGS, TOPPING_PRICE, SizeId, calcUnitPrice, formatVnd } from '../lib/pricing';
 
 const resolveDrinkImage = (name: string, imageUrl?: string | null): string => {
-  if (imageUrl && imageUrl.trim().length > 0) return imageUrl;
+  if (imageUrl && imageUrl.trim().length > 0 && !imageUrl.startsWith('http://img.com')) return imageUrl;
   const n = name.toLowerCase();
+  if (n.includes('đen') || n.includes('den')) return '/drinks/ca-phe-den-da.jpg';
+  if (n.includes('muối') || n.includes('muoi')) return '/drinks/ca-phe-muoi.jpg';
+  if (n.includes('bạc xỉu') || n.includes('bac xiu')) return '/drinks/bac-xiu.jpg';
   if (n.includes('sữa') || n.includes('sua')) return '/drinks/ca-phe-sua-da.jpg';
-  if (n.includes('đào') || n.includes('dao')) return '/drinks/tra-dao-cam-sa.jpg';
   if (n.includes('americano')) return '/drinks/americano.jpg';
   if (n.includes('cappuccino')) return '/drinks/cappuccino.jpg';
-  if (n.includes('bạc xỉu') || n.includes('bac xiu')) return '/drinks/bac-xiu.jpg';
+  if (n.includes('đào') || n.includes('dao')) return '/drinks/tra-dao-cam-sa.jpg';
+  if (n.includes('vải') || n.includes('vai') || n.includes('hoa hồng')) return '/drinks/tra-vai-hoa-hong.jpg';
+  if (n.includes('dâu') || n.includes('dau') || n.includes('ổi')) return '/drinks/tra-dau-oi-hong.jpg';
+  if (n.includes('matcha')) return '/drinks/matcha-latte.jpg';
+  if (n.includes('oolong') || n.includes('ô long') || n.includes('o long')) return '/drinks/tra-sua-oolong.jpg';
   if (n.includes('sen')) return '/drinks/tra-sen-vang.jpg';
   return '/drinks/ca-phe-sua-da.jpg';
 };

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { Coffee, Sparkles, AlertCircle, ArrowRight } from 'lucide-react';
+import { Coffee, Sparkles, AlertCircle, ArrowRight, Search, X } from 'lucide-react';
 import { Product, UserProfile } from './types';
 import type { NewCartItem } from './lib/cart';
 import { fetchProducts, fetchUserProfile } from './lib/api';
@@ -17,10 +17,54 @@ import { MockPaymentGatewayModal } from './components/MockPaymentGatewayModal';
 import { OrderConfirmationModal } from './components/OrderConfirmationModal';
 import { OrderHistoryView } from './components/OrderHistoryView';
 
+type Category = 'ALL' | 'COFFEE' | 'FRUIT_TEA' | 'MILK_TEA';
+
+const CATEGORIES: { id: Category; label: string }[] = [
+  { id: 'ALL', label: 'Tất cả' },
+  { id: 'COFFEE', label: '☕ Cà phê & Espresso' },
+  { id: 'FRUIT_TEA', label: '🍑 Trà trái cây tươi' },
+  { id: 'MILK_TEA', label: '🧋 Trà sữa & Macchiato' },
+];
+
+function getCategoryForProduct(name: string): Category {
+  const lower = name.toLowerCase();
+  if (
+    lower.includes('trà sữa') ||
+    lower.includes('macchiato') ||
+    lower.includes('matcha') ||
+    lower.includes('sen vàng')
+  ) {
+    return 'MILK_TEA';
+  }
+  if (
+    lower.includes('trà') ||
+    lower.includes('đào') ||
+    lower.includes('vải') ||
+    lower.includes('dâu') ||
+    lower.includes('ổi')
+  ) {
+    return 'FRUIT_TEA';
+  }
+  if (
+    lower.includes('cà phê') ||
+    lower.includes('bạc xỉu') ||
+    lower.includes('americano') ||
+    lower.includes('cappuccino') ||
+    lower.includes('espresso')
+  ) {
+    return 'COFFEE';
+  }
+  return 'ALL';
+}
+
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Search & Filter state
+  const [selectedCategory, setSelectedCategory] = useState<Category>('ALL');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // User & Auth State (Task 7)
   const [token, setToken] = useState<string | null>(() => {
@@ -177,6 +221,15 @@ export default function Home() {
     }
   };
 
+  const filteredProducts = products.filter((p) => {
+    const matchesCategory =
+      selectedCategory === 'ALL' || getCategoryForProduct(p.name) === selectedCategory;
+    const matchesSearch =
+      !searchQuery.trim() ||
+      p.name.toLowerCase().includes(searchQuery.trim().toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
   return (
     <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col font-sans selection:bg-amber-500 selection:text-stone-950">
       {/* Toast Notification */}
@@ -249,7 +302,7 @@ export default function Home() {
 
             {/* Menu Section */}
             <section id="menu-section">
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div>
                   <h2 className="text-2xl font-black text-white tracking-tight flex items-center gap-2">
                     <Coffee className="w-6 h-6 text-amber-500" />
@@ -260,9 +313,49 @@ export default function Home() {
                   </p>
                 </div>
 
-                <span className="text-xs text-stone-400 font-medium">
-                  {products.length} thức uống
-                </span>
+                <div className="flex items-center gap-3">
+                  {/* Search Bar */}
+                  <div className="relative">
+                    <Search className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Tìm thức uống..."
+                      className="w-48 sm:w-60 bg-stone-900 border border-stone-800 rounded-xl pl-9 pr-8 py-2 text-xs text-stone-200 placeholder-stone-500 focus:outline-none focus:border-amber-500/50 transition"
+                    />
+                    {searchQuery && (
+                      <button
+                        onClick={() => setSearchQuery('')}
+                        aria-label="Xóa tìm kiếm"
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-500 hover:text-stone-300"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+
+                  <span className="text-xs text-stone-400 font-medium whitespace-nowrap">
+                    {products.length} thức uống
+                  </span>
+                </div>
+              </div>
+
+              {/* Category Filter Tabs */}
+              <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 scrollbar-none">
+                {CATEGORIES.map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setSelectedCategory(cat.id)}
+                    className={`px-4 py-2 rounded-xl text-xs font-semibold transition whitespace-nowrap ${
+                      selectedCategory === cat.id
+                        ? 'bg-amber-500 text-stone-950 shadow-md shadow-amber-500/20'
+                        : 'bg-stone-900 text-stone-400 border border-stone-800/80 hover:text-stone-200 hover:border-stone-700'
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
               </div>
 
               {/* Error state */}
@@ -302,10 +395,30 @@ export default function Home() {
                     Hệ thống đang chuẩn bị menu. Vui lòng quay lại sau ít phút!
                   </p>
                 </div>
+              ) : filteredProducts.length === 0 ? (
+                /* Filtered empty state (khi tìm kiếm hoặc chọn danh mục không có món) */
+                <div className="text-center py-16 bg-stone-900/40 border border-stone-800/60 rounded-3xl p-6">
+                  <Search className="w-10 h-10 text-stone-600 mx-auto mb-3" />
+                  <p className="text-sm font-bold text-stone-300">
+                    Không tìm thấy thức uống phù hợp
+                  </p>
+                  <p className="text-xs text-stone-500 mt-1 mb-4">
+                    Thử đổi từ khóa hoặc chọn danh mục khác nhé!
+                  </p>
+                  <button
+                    onClick={() => {
+                      setSelectedCategory('ALL');
+                      setSearchQuery('');
+                    }}
+                    className="px-4 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-semibold transition"
+                  >
+                    Xóa bộ lọc
+                  </button>
+                </div>
               ) : (
                 /* Products Grid */
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                  {products.map((product) => (
+                  {filteredProducts.map((product) => (
                     <ProductCard
                       key={product.id}
                       product={product}
