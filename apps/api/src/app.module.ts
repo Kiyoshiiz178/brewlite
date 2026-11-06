@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module.js';
 import { OrdersModule } from './orders/orders.module.js';
 import { PaymentsModule } from './payments/payments.module.js';
 import { PromotionsModule } from './promotions/promotions.module.js';
+import { InventoryModule } from './inventory/inventory.module.js';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { PromotionsModule } from './promotions/promotions.module.js';
     OrdersModule,
     PaymentsModule,
     PromotionsModule,
+    InventoryModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],

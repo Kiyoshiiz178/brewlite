@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { ProductsService } from './products.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 
@@ -90,6 +90,15 @@ describe('ProductsService', () => {
           version: 0,
         },
       });
+    });
+
+    it('chặn tạo món trùng hoặc quá tương tự (ví dụ Cà phê sữa vs Cà phê sữa đá)', async () => {
+      await expect(
+        service.create({
+          name: 'Cà phê sữa',
+          price: 35000,
+        }),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 

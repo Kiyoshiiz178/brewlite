@@ -1,4 +1,4 @@
-import { Product, Order, UserProfile } from '../types';
+import { Product, Order, UserProfile, Ingredient, ProductRecipeDetail } from '../types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -164,4 +164,128 @@ export async function fetchAllPayments() {
   if (!res.ok) throw new Error('Không thể tải nhật ký thanh toán');
   return res.json();
 }
+
+export async function fetchIngredients(): Promise<Ingredient[]> {
+  const res = await fetch(`${API_URL}/inventory/ingredients`, { cache: 'no-store' });
+  if (!res.ok) throw new Error('Không thể tải danh sách nguyên liệu kho');
+  return res.json();
+}
+
+export async function createIngredient(data: {
+  name: string;
+  unit: string;
+  stock?: number;
+  minStockAlert?: number;
+}): Promise<Ingredient> {
+  const res = await fetch(`${API_URL}/inventory/ingredients`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  const resData = await res.json();
+  if (!res.ok) throw new Error(resData.message || 'Không thể tạo nguyên liệu mới');
+  return resData;
+}
+
+export async function updateIngredient(
+  id: number,
+  data: { name?: string; unit?: string; stock?: number; minStockAlert?: number },
+): Promise<Ingredient> {
+  const res = await fetch(`${API_URL}/inventory/ingredients/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  const resData = await res.json();
+  if (!res.ok) throw new Error(resData.message || 'Không thể cập nhật nguyên liệu');
+  return resData;
+}
+
+export async function restockIngredient(
+  id: number,
+  amount: number,
+): Promise<{ ingredient: Ingredient; affectedProducts: Array<{ productId: number; stock: number }> }> {
+  const res = await fetch(`${API_URL}/inventory/ingredients/${id}/restock`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ amount }),
+  });
+  const resData = await res.json();
+  if (!res.ok) throw new Error(resData.message || 'Nhập kho thất bại');
+  return resData;
+}
+
+export async function fetchRecipes(): Promise<ProductRecipeDetail[]> {
+  const res = await fetch(`${API_URL}/inventory/recipes`, { cache: 'no-store' });
+  if (!res.ok) throw new Error('Không thể tải danh sách công thức');
+  return res.json();
+}
+
+export async function saveProductRecipe(
+  productId: number,
+  items: Array<{ ingredientId: number; amount: number }>,
+): Promise<unknown> {
+  const res = await fetch(`${API_URL}/inventory/recipes/${productId}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ items }),
+  });
+  const resData = await res.json();
+  if (!res.ok) throw new Error(resData.message || 'Không thể lưu công thức');
+  return resData;
+}
+
+export async function recalculateAllStock(): Promise<unknown> {
+  const res = await fetch(`${API_URL}/inventory/recalculate-all`, {
+    method: 'POST',
+  });
+  const resData = await res.json();
+  if (!res.ok) throw new Error(resData.message || 'Không thể tính lại tồn kho');
+  return resData;
+}
+
+export async function createVnpayUrl(
+  orderId: number,
+  bankCode?: string,
+): Promise<{ paymentUrl: string; orderId: number; amount: number }> {
+  const res = await fetch(`${API_URL}/payments/vnpay-url`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ orderId, bankCode }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || 'Không thể tạo liên kết thanh toán VNPay');
+  }
+  return data;
+}
+
+export async function verifyVnpayReturn(
+  queryString: string,
+): Promise<{
+  success: boolean;
+  orderId: number;
+  amount: number;
+  transactionNo?: string;
+  bankCode?: string;
+  message: string;
+  status?: string;
+  responseCode?: string;
+}> {
+  const res = await fetch(`${API_URL}/payments/vnpay-verify?${queryString}`);
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || 'Xác thực thanh toán VNPay thất bại');
+  }
+  return data;
+}
+
+export async function fetchOrderById(orderId: number): Promise<Order> {
+  const res = await fetch(`${API_URL}/orders/${orderId}`, { cache: 'no-store' });
+  if (!res.ok) throw new Error('Không thể tải thông tin đơn hàng');
+  return res.json();
+}
+
+
+
 
