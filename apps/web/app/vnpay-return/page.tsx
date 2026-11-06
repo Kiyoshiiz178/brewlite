@@ -3,7 +3,7 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { CheckCircle2, XCircle, Loader2, ArrowLeft, Coffee, ShieldCheck } from 'lucide-react';
+import { CheckCircle2, XCircle, Loader2, ArrowLeft, Coffee } from 'lucide-react';
 import { verifyVnpayReturn } from '../lib/api';
 import { useCart } from '../components/CartProvider';
 
@@ -26,26 +26,42 @@ function VnpayReturnContent() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const qs = searchParams.toString();
-    if (!qs) {
-      setError('Không tìm thấy thông tin phản hồi từ cổng thanh toán');
-      setLoading(false);
-      return;
-    }
+    let ignore = false;
 
-    verifyVnpayReturn(qs)
-      .then((data) => {
-        setResult(data);
-        if (data.success) {
-          clear();
+    const runVerification = async () => {
+      const qs = searchParams.toString();
+      if (!qs) {
+        if (!ignore) {
+          setError('Không tìm thấy thông tin phản hồi từ cổng thanh toán');
+          setLoading(false);
         }
-      })
-      .catch((err: unknown) => {
-        setError(err instanceof Error ? err.message : 'Xác thực thanh toán thất bại');
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+        return;
+      }
+
+      try {
+        const data = await verifyVnpayReturn(qs);
+        if (!ignore) {
+          setResult(data);
+          if (data.success) {
+            clear();
+          }
+        }
+      } catch (err: unknown) {
+        if (!ignore) {
+          setError(err instanceof Error ? err.message : 'Xác thực thanh toán thất bại');
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    };
+
+    runVerification();
+
+    return () => {
+      ignore = true;
+    };
   }, [searchParams, clear]);
 
   if (loading) {

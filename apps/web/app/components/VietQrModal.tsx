@@ -8,7 +8,6 @@ import {
   Loader2,
   CheckCircle2,
   Sparkles,
-  ShieldCheck,
   QrCode,
   AlertCircle,
 } from 'lucide-react';
@@ -112,6 +111,7 @@ export const VietQrModal: React.FC<VietQrModalProps> = ({
           <>
             {/* QR Code Container */}
             <div className="bg-white p-4 rounded-2xl mx-auto shadow-xl border-4 border-amber-500/30 mb-4 max-w-[260px]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={qrUrl}
                 alt="VietQR Payment"
