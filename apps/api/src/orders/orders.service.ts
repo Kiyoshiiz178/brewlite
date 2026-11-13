@@ -6,10 +6,15 @@ import {
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateOrderDto } from './dto/create-order.dto.js';
 import { OrderStatus, assertTransition } from './order-state-machine.js';
+import { InventoryService } from '../inventory/inventory.service.js';
 
 @Injectable()
 export class OrdersService {
-  constructor(private readonly prisma: PrismaService) { }
+  private readonly inventoryService: InventoryService;
+
+  constructor(private readonly prisma: PrismaService) {
+    this.inventoryService = new InventoryService(this.prisma);
+  }
 
   async create(userId: number | undefined, dto: CreateOrderDto) {
     if (!dto.items || dto.items.length === 0) {
@@ -82,6 +87,11 @@ export class OrdersService {
           qty: item.qty,
           lineTotal,
         });
+      }
+
+      // Trừ kho nguyên liệu theo công thức nếu có bảng recipeItem
+      if ((tx as any).recipeItem && typeof (tx as any).recipeItem.findMany === 'function') {
+        await this.inventoryService.deductIngredientsForOrder(dto.items, tx);
       }
 
       // Xử lý mã khuyến mãi
@@ -205,6 +215,13 @@ export class OrdersService {
 
     // State machine check
     assertTransition(order.status, nextStatus);
+
+    // Hoàn kho nguyên liệu nếu hủy đơn hàng
+    if (nextStatus === OrderStatus.CANCELLED && order.status !== OrderStatus.CANCELLED) {
+      if ((this.prisma as any).recipeItem && typeof (this.prisma as any).recipeItem.findMany === 'function') {
+        await this.inventoryService.restoreIngredientsForOrder(id, this.prisma);
+      }
+    }
 
     return this.prisma.order.update({
       where: { id },

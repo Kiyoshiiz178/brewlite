@@ -70,3 +70,39 @@ export interface PaymentAuditRecord {
   };
 }
 
+export interface Ingredient {
+  id: number;
+  name: string;
+  unit: string;
+  stock: number;
+  minStockAlert: number;
+  status: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK';
+}
+
+export interface BottleneckInfo {
+  ingredientId: number;
+  ingredientName: string;
+  unit: string;
+  currentStock: number;
+  requiredAmount: number;
+  limitingCups: number;
+}
+
+export interface ProductRecipeDetail {
+  productId: number;
+  productName: string;
+  price: number;
+  stock: number;
+  maxCups: number;
+  bottleneck: BottleneckInfo | null;
+  recipes: Array<{
+    id: number;
+    ingredientId: number;
+    ingredientName: string;
+    unit: string;
+    amount: number;
+    currentStock: number;
+  }>;
+}
+
+

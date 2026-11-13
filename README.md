@@ -5,10 +5,18 @@ Bài tập lớn môn Công nghệ Phần mềm (Học kỳ I - Năm học 2026-
 ---
 
 ## 1. Kiến trúc & Công nghệ
+
 - **Frontend**: Next.js 16 (React 19, TypeScript, Tailwind CSS, Lucide Icons) – Cổng `3000`
-- **Backend**: NestJS 12 (ESM, TypeScript, class-validator, JWT Passport) – Cổng `4000`
+- **Backend API**: NestJS 12 (ESM, TypeScript, class-validator, JWT Passport) – Cổng `4000`
 - **Database & ORM**: PostgreSQL 16 + Prisma 7 (pg adapter) – Cổng `5432`
-- **Containerization**: Docker & Docker Compose chạy đồng thời cả 3 dịch vụ (`web`, `api`, `db`)
+- **Tích hợp Thanh toán**:
+  - **VietQR Napas 247 (Ngân hàng MBBank thật)**: Tự động xác thực biến động số dư qua **SePay Webhook**.
+  - **Cổng thanh toán VNPay Sandbox**: Bảo mật chữ ký điện tử chuẩn băm `HMAC-SHA512`.
+  - **Mock Payment Gateway**: Mô phỏng giao dịch Ví điện tử / Thẻ ngân hàng nội bộ.
+- **Hệ thống Quản lý Kho & Định mức công thức (BOM)**:
+  - Tự động tính số ly có thể bán theo nguyên liệu thắt nút cổ chai nhỏ nhất.
+  - Tự động trừ nguyên liệu khi đặt đơn và hoàn kho khi hủy đơn.
+- **Containerization & Networking**: Docker & Docker Compose chạy đồng thời cả 3 dịch vụ (`web`, `api`, `db`) kèm Cloudflare Tunnel cho Webhook.
 
 ---
 
@@ -20,22 +28,22 @@ Bài tập lớn môn Công nghệ Phần mềm (Học kỳ I - Năm học 2026-
 - **Cặp 2 — Frontend, Menu & Giỏ hàng**: **Trung** & **Tài**
   - Phụ trách giao diện người dùng Next.js, hiển thị lưới menu, chi tiết món tùy chọn size/topping, giỏ hàng CartProvider và bộ test frontend Vitest (Task 1, Task 3, Task 4, Task 5).
 - **Cặp 3 — Nghiệp vụ, Thanh toán & Scrum**: **Tâm** & **Thịnh**
-  - Phụ trách xác thực JWT/bcrypt, thanh toán không tiền mặt mock gateway, màn hình xác nhận/lịch sử, State machine, tồn kho đồng thời, Docker Compose và quản lý Scrum (Task 7, Task 8, Task 9, Task 10).
+  - Phụ trách xác thực JWT/bcrypt, đa kênh thanh toán không tiền mặt (VietQR SePay, VNPay, Mock), màn hình xác nhận/lịch sử, State machine, tồn kho đồng thời (Optimistic Locking), quản lý kho BOM, Docker Compose và quản lý Scrum (Task 7, Task 8, Task 9, Task 10).
 
 ### 2.2. Danh sách 10 Task Scrum
 
 | Task | Tên Task | Người phụ trách | Mô tả & Tiêu chí nghiệm thu | Trạng thái |
 |---|---|---|---|---|
-| **Task 1** | Khởi tạo dự án và cấu trúc | Cả nhóm (Tuân, Quân, Trung, Tài, Tâm, Thịnh) | Monorepo Next.js + NestJS + Docker Compose + Git | ✅ Hoàn thành |
+| **Task 1** | Khởi tạo dự án và cấu trúc | Cả nhóm | Monorepo Next.js + NestJS + Docker Compose + Git | ✅ Hoàn thành |
 | **Task 2** | API danh sách sản phẩm | Tuân, Quân | `GET /products`, `GET /products/:id` từ PostgreSQL | ✅ Hoàn thành |
-| **Task 3** | Trang Menu (Frontend) | Trung, Tài | Next.js render lưới đồ uống, loading/empty states | ✅ Hoàn thành |
+| **Task 3** | Trang Menu (Frontend) | Trung, Tài | Next.js render lưới đồ uống, loading/empty/error states | ✅ Hoàn thành |
 | **Task 4** | Chi tiết & tùy chọn sản phẩm | Trung, Tài | Chọn size (S/M/L), topping (Trân châu, Kem cheese, Thạch), tính giá động | ✅ Hoàn thành |
-| **Task 5** | Giỏ hàng (Cart) | Trung, Tài | Thêm, sửa số lượng, xóa món, lưu trạng thái giỏ, badge đếm số lượng | ✅ Hoàn thành |
+| **Task 5** | Giỏ hàng (Cart) | Trung, Tài | Thêm, sửa số lượng, xóa món, lưu LocalStorage, badge đếm số lượng | ✅ Hoàn thành |
 | **Task 6** | API tạo đơn hàng | Tuân, Quân | `POST /orders`, validate class-validator, lưu trạng thái PENDING | ✅ Hoàn thành |
-| **Task 7** | Đăng ký / Đăng nhập (JWT) | Tâm, Thịnh | `POST /auth/register`, `POST /auth/login`, băm bcrypt, cấp JWT, bảo vệ route đơn hàng | ✅ Hoàn thành |
-| **Task 8** | Thanh toán không tiền mặt | Tâm, Thịnh | `POST /payments`, chọn Ví điện tử / Thẻ, chuyển `PAID` khi thành công, `PAYMENT_FAILED` khi lỗi | ✅ Hoàn thành |
-| **Task 9** | Xác nhận, lịch sử đơn & bàn giao | Tâm, Thịnh (Toàn đội) | Màn hình xác nhận mã đơn (#1042), `GET /orders/me`, Docker Compose 3 services | ✅ Hoàn thành |
-| **Task 10**| Nghiệp vụ Backend nâng cao | Tâm, Thịnh | Order State Machine, Idempotent Payment, Optimistic Locking tồn kho, Loyalty Points | ✅ Hoàn thành |
+| **Task 7** | Đăng ký / Đăng nhập (JWT) | Tâm, Thịnh | `POST /auth/register`, `POST /auth/login`, băm bcrypt (cost=10), cấp JWT stateless, JwtAuthGuard | ✅ Hoàn thành |
+| **Task 8** | Thanh toán không tiền mặt | Tâm, Thịnh | Tích hợp VietQR (SePay Webhook MBBank), Cổng VNPay Sandbox (HMAC-SHA512) & Mock Gateway | ✅ Hoàn thành |
+| **Task 9** | Xác nhận, lịch sử đơn & bàn giao | Tâm, Thịnh (Toàn đội) | Modal xác nhận mã đơn (#id), timeline tiến trình `GET /orders/me`, Docker Compose trọn gói 3 services | ✅ Hoàn thành |
+| **Task 10**| Nghiệp vụ Backend nâng cao | Tâm, Thịnh | Order State Machine, Idempotent Payment (`Idempotency-Key`), Optimistic Locking tồn kho, Loyalty Points | ✅ Hoàn thành |
 
 ---
 
@@ -52,8 +60,17 @@ Bài tập lớn môn Công nghệ Phần mềm (Học kỳ I - Năm học 2026-
 | `GET` | `/orders/me` | Lấy danh sách lịch sử đơn hàng của user | JWT Guard |
 | `GET` | `/orders/:id` | Xem chi tiết đơn hàng | Public |
 | `PATCH`| `/orders/:id/status` | Cập nhật trạng thái đơn (kiểm tra State Machine) | Public |
-| `POST` | `/payments` | Thanh toán không tiền mặt (Idempotency Key) | Public |
-| `GET` | `/promotions/validate?code=` | Kiểm tra mã voucher giảm giá (`BREW10`, `WELCOME20`) | Public |
+| `POST` | `/payments` | Thanh toán không tiền mặt nội bộ (Idempotency Key) | Public |
+| `POST` | `/payments/sepay-webhook` | Webhook tiếp nhận biến động số dư SePay (MBBank) | Public |
+| `POST` | `/payments/vnpay-url` | Sinh URL thanh toán cổng VNPay Sandbox | Public |
+| `GET` | `/payments/vnpay-verify` | Xác thực chữ ký số phản hồi từ VNPay | Public |
+| `GET` | `/payments/vnpay-ipn` | Server-to-server IPN từ VNPay | Public |
+| `GET` | `/inventory/ingredients` | Lấy danh sách nguyên vật liệu kho | Public |
+| `POST` | `/inventory/ingredients` | Tạo mới nguyên vật liệu | Public |
+| `POST` | `/inventory/restock` | Nhập thêm số lượng nguyên liệu vào kho | Public |
+| `GET` | `/inventory/recipes/:id` | Lấy định mức công thức của món | Public |
+| `POST` | `/inventory/recipes/:id` | Lưu cấu hình công thức pha chế | Public |
+| `GET` | `/promotions/validate?code=` | Kiểm tra mã voucher (`BREW10`, `WELCOME20`) | Public |
 | `GET` | `/health` | Kiểm tra trạng thái hoạt động backend | Public |
 
 ---
@@ -96,36 +113,45 @@ PAYMENT_FAILED           CANCELLED
 
 ---
 
-## 5. Hướng dẫn chạy hệ thống
+## 5. Hướng dẫn khởi động hệ thống (Full Setup)
 
-### Cách 1: Chạy bằng Docker Compose (Bàn giao trọn gói cả 3 services)
-Đảm bảo đã cài đặt Docker Desktop:
-```bash
-# Đứng tại thư mục gốc brewlite
-docker compose up --build
+### Cách 1: Khởi động nhanh bằng Docker Compose (Khuyên dùng)
+Đảm bảo máy tính đã cài đặt và bật **Docker Desktop**. Mở PowerShell tại thư mục gốc `brewlite` và chạy:
+
+```powershell
+# 1. Khởi động toàn bộ 3 dịch vụ (Web, API, PostgreSQL)
+docker compose up --build -d
+
+# 2. Kiểm tra trạng thái các container đang chạy
+docker ps
 ```
-- Frontend: Truy cập http://localhost:3000
-- Backend API: Truy cập http://localhost:4000/health
-- PostgreSQL: Cổng 5432
 
-### Cách 2: Chạy cục bộ từng phần (Local Development)
+- **Frontend (Web khách hàng)**: [http://localhost:3000](http://localhost:3000)
+- **Admin Dashboard (Quản lý kho & công thức)**: [http://localhost:3000/admin](http://localhost:3000/admin)
+- **Backend API**: [http://localhost:4000/health](http://localhost:4000/health)
+- **PostgreSQL Database**: Cổng `5432`
+
+---
+
+### Cách 2: Khởi động cục bộ từng dịch vụ (Local Development)
+
 #### Bước 1: Khởi động Database
-```bash
+```powershell
 docker compose up -d db
 ```
 
 #### Bước 2: Khởi động Backend (apps/api)
-```bash
+```powershell
 cd apps/api
-# Tạo .env từ .env.example
 npm install
 npx prisma migrate dev
-npm run seed     # Khởi tạo món ăn mẫu và mã khuyến mãi
+npm run seed     # Khởi tạo sản phẩm, nguyên vật liệu, công thức và voucher
 npm run start:dev
 ```
 
 #### Bước 3: Khởi động Frontend (apps/web)
-```bash
+Mở cửa sổ PowerShell mới:
+```powershell
 cd apps/web
 npm install
 npm run dev
@@ -133,55 +159,131 @@ npm run dev
 
 ---
 
-## 6. Chạy Test Suites (Minh chứng tiêu chí kiểm thử)
+## 6. Hướng dẫn chi tiết các Phương thức Thanh toán
 
-Hệ thống bao gồm bộ test kiểm thử tự động toàn diện với Vitest cho cả Backend và Frontend gồm **13 suites (81 test cases)**:
+Hệ thống hỗ trợ 3 hình thức thanh toán không tiền mặt đáp ứng toàn diện các tiêu chí đánh giá:
 
-### 6.1. Backend API (NestJS) – 8 suites (42 test cases)
-```bash
-cd apps/api
-npm run test
 ```
-
-**Danh sách các bộ Unit & Integration Tests Backend:**
-1. **API Sản phẩm (Task 2 - Tuân, Quân)**:
-   - `src/products/products.service.spec.ts`: Test `findAll`, `findOne` (thành công và ném 404), `create`, `update`, `remove`.
-   - `src/products/products.controller.spec.ts`: Test controller endpoints với `ParseIntPipe`.
-2. **API Đặt hàng & Giỏ hàng (Task 6 - Tuân, Quân)**:
-   - `src/orders/orders.service.spec.ts`: Test tạo đơn `PENDING`, tính giá động size/topping, áp mã voucher, kiểm tra tồn kho, phát hiện xung đột optimistic locking, ném lỗi 400/404 khi vi phạm, lịch sử `findMyOrders`, cập nhật trạng thái `updateStatus`.
-   - `src/orders/orders.controller.spec.ts`: Test controller bảo vệ bởi `JwtAuthGuard`.
-3. **API Xác thực (Task 7 - Tâm, Thịnh)**:
-   - `src/auth/auth.service.spec.ts` & `src/auth/auth.controller.spec.ts`: Test đăng ký, đăng nhập bcrypt, phát token JWT.
-4. **Nghiệp vụ nâng cao (Task 10 & DoD - Tâm, Thịnh)**:
-   - `test/task10.spec.ts`:
-     - `(a)` Chặn thành công mọi chuyển trạng thái sai (`assertTransition`).
-     - `(b)` Gửi lặp lại cùng `Idempotency-Key` chỉ tạo 1 bản ghi payment và không nhân đôi điểm loyalty.
-     - `(c)` Đặt đơn đồng thời không bao giờ vượt quá số lượng tồn kho (Optimistic Locking).
-     - `(d)` Áp mã giảm giá và tích lũy điểm thưởng chính xác.
-
-### 6.2. Frontend Web (Next.js) – 5 suites (39 test cases)
-```bash
-cd apps/web
-npm install
-npm run test
+                            ┌───────────────────────────────────────────────┐
+                            │           CHỌN PHƯƠNG THỨC THANH TOÁN         │
+                            └───────┬───────────────┬───────────────┬───────┘
+                                    │               │               │
+                                    ▼               ▼               ▼
+                       ┌────────────────┐ ┌────────────────┐ ┌────────────────┐
+                       │  Quét VietQR   │ │ Cổng VNPay SB  │ │  Ví/Thẻ Mock   │
+                       │  (App ngân hàng│ │ (Thẻ ATM/Visa  │ │ (Mô phỏng nội  │
+                       │   MBBank thật) │ │  bảo mật HMAC) │ │  bộ + test lỗi)│
+                       └────────────────┘ └────────────────┘ └────────────────┘
 ```
-
-**Danh sách các bộ Unit & Component Tests Frontend:**
-5. **Menu, Tùy chọn món & Giỏ hàng (Task 3, 4, 5 - Trung, Tài)** (Vitest + React Testing Library):
-   - `__tests__/pricing.test.ts`: Giá size/topping khớp cách tính của server (M +5k, L +10k, mỗi topping +5k).
-   - `__tests__/cart.test.ts`: Thêm/gộp dòng, sửa số lượng, xóa, không vượt tồn kho, tổng tiền, đọc giỏ đã lưu.
-   - `__tests__/ProductModal.test.tsx`: Chọn size/topping, giá đổi theo, giới hạn tồn kho, đặt lại khi đổi sản phẩm.
-   - `__tests__/CartDrawer.test.tsx`: Giỏ trống, hiển thị topping, tăng/giảm/xóa, nút thanh toán.
-   - `__tests__/MenuPage.test.tsx`: Trạng thái loading/empty/error của Menu và luồng menu → chi tiết → giỏ hàng (lưu khi F5).
 
 ---
 
-## 7. Kịch bản Demo End-to-End (Dành cho buổi nghiệm thu)
-1. **Xem Menu**: Mở `http://localhost:3000`, quan sát danh sách thức uống, giá và số lượng tồn kho.
-2. **Chọn món & tùy chỉnh**: Bấm "Tùy chọn" một thức uống (vd: Cà phê sữa đá) -> Chọn size M (+5k), thêm Trân châu (+5k) -> Thêm vào giỏ.
-3. **Giỏ hàng**: Mở giỏ hàng, quan sát badge số lượng, thử tăng/giảm số lượng hoặc xóa món.
-4. **Đăng ký / Đăng nhập**: Nhấn "Thanh toán", popup đăng nhập hiển thị -> Đăng ký tài khoản mới hoặc đăng nhập.
-5. **Áp mã giảm giá**: Tại màn hình thanh toán, nhập mã `BREW10` -> Giảm giá 10% ngay trên hóa đơn.
-6. **Thử nghiệm thanh toán lỗi**: Tích chọn "Mô phỏng lỗi thanh toán" -> Nhấn xác nhận -> Đơn chuyển `PAYMENT_FAILED`, giỏ hàng được giữ nguyên.
-7. **Thanh toán thành công**: Bỏ chọn lỗi -> Nhấn xác nhận -> Đơn chuyển `PAID`, nhận mã đơn `#...`, thông báo "Mời tới quầy lấy nước", nhận điểm thưởng loyalty.
-8. **Xem Lịch sử đơn**: Chuyển sang tab "Lịch sử đơn" -> Quan sát timeline tiến trình trạng thái và điểm tích lũy vừa được cộng.
+### 🟢 Phương thức 1: Quét mã VietQR (Tự động xác nhận qua SePay Webhook)
+> **Đặc điểm**: Khách hàng quét mã QR bằng App ngân hàng bất kỳ (Vietcombank, MB, Techcombank, Momo, v.v.). Khi tiền vào tài khoản MBBank thật của chủ quán, hệ thống SePay tự động gọi Webhook về máy chủ để chuyển trạng thái đơn hàng sang `PAID` trong 1-2 giây.
+
+#### Bước 1: Khởi chạy Cloudflare Tunnel để nhận Webhook từ Internet
+Mở một cửa sổ PowerShell riêng tại thư mục dự án và chạy:
+```powershell
+.\cloudflared.exe tunnel --url http://localhost:4000
+```
+Màn hình sẽ hiển thị link tunnel có dạng:
+`https://<tên-ngẫu-nhiên>.trycloudflare.com`
+
+#### Bước 2: Cấu hình Webhook trên SePay (Chỉ cần làm 1 lần)
+1. Đăng nhập [my.sepay.vn](https://my.sepay.vn) -> Chọn **Webhooks** -> Bấm Sửa hoặc Thêm Webhook.
+2. Dán link nhận Webhook:
+   ```text
+   https://<tên-ngẫu-nhiên>.trycloudflare.com/payments/sepay-webhook
+   ```
+   *(Ví dụ đang hoạt động: `https://strings-satellite-enrolled-maine.trycloudflare.com/payments/sepay-webhook`)*
+3. **Loại giao dịch**: Chọn `Tiền vào`.
+4. **Định dạng dữ liệu**: Chọn `JSON`.
+5. **Bảo mật**: Chọn `Không xác thực`.
+6. Bấm **Lưu thay đổi**.
+
+#### Bước 3: Trải nghiệm thanh toán
+1. Vào `http://localhost:3000` -> Đăng nhập tài khoản -> Thêm món vào giỏ -> Bấm **Thanh toán**.
+2. Chọn phương thức: **"Quét mã VietQR (App ngân hàng thật - Tự động qua SePay)"**.
+3. Bấm **Tạo mã VietQR**: Màn hình hiển thị mã QR kèm đúng số tiền và nội dung chuyển khoản `BREWLITE<id>`.
+4. Mở App ngân hàng trên điện thoại quét mã và chuyển tiền (chuyển test từ 1.000đ trở lên).
+5. **Kết quả**: Ngay khi giao dịch hoàn tất, màn hình máy tính tự động nhảy sang thông báo **"Đặt hàng thành công!"**, cộng điểm loyalty và làm sạch giỏ hàng.
+
+---
+
+### 🔵 Phương thức 2: Cổng thanh toán VNPay Sandbox (Thẻ ATM Nội địa)
+> **Đặc điểm**: Điều hướng sang cổng VNPay chính thức, băm chữ ký `HMAC-SHA512` bảo mật, sau khi nhập mã OTP sẽ tự động redirect về trang `/vnpay-return` xác thực kết quả.
+
+1. Tại màn hình Checkout, chọn phương thức: **"VNPay Sandbox"** -> Bấm **Chuyển sang VNPay**.
+2. Trình duyệt điều hướng sang cổng thanh toán VNPay Sandbox.
+3. Chọn phương thức: **"Thẻ nội địa và tài khoản ngân hàng"** -> Chọn ngân hàng **NCB** (hoặc bất kỳ).
+4. Nhập thông tin thẻ thử nghiệm chính thức của VNPay:
+   - **Số thẻ**: `9704198526191432198`
+   - **Tên chủ thẻ**: `NGUYEN VAN A`
+   - **Ngày phát hành**: `07/15`
+   - Bấm **Tiếp tục**.
+5. Nhập mã xác thực OTP:
+   - **Mã OTP**: `123456`
+   - Bấm **Thanh toán**.
+6. **Kết quả**: Cổng VNPay điều hướng trở về trang `http://localhost:3000/vnpay-return`, hiển thị mã giao dịch, số tiền và thông báo thanh toán thành công.
+
+---
+
+### 🟡 Phương thức 3: Ví điện tử / Thẻ nội bộ (Mock Payment Gateway)
+> **Đặc điểm**: Phục vụ kiểm thử nhanh các trường hợp thành công và thất bại mà không cần Internet.
+
+1. Tại màn hình Checkout, chọn phương thức: **"Ví điện tử (Momo/ZaloPay)"** hoặc **"Thẻ thanh toán (Visa/Mastercard)"**.
+2. Bấm **Xác nhận thanh toán**: Popup cổng mô phỏng hiển thị.
+3. **Thử nghiệm lỗi (Failure Case)**:
+   - Tích chọn switch **"Mô phỏng lỗi thanh toán"** -> Bấm **Xác nhận**.
+   - Đơn chuyển sang trạng thái `PAYMENT_FAILED`. Giỏ hàng của khách hàng **được giữ nguyên** để có thể thử lại.
+4. **Thử nghiệm thành công (Success Case)**:
+   - Tắt switch lỗi -> Bấm **Xác nhận**.
+   - Đơn chuyển sang `PAID`, kích hoạt trừ kho, cộng điểm và mở modal chúc mừng.
+
+---
+
+## 7. Thông tin Tài khoản Thử nghiệm (Demo Accounts)
+
+### 7.1. Tài khoản Khách hàng (Customer)
+- **Email**: `customer@brewlite.vn`
+- **Mật khẩu**: `123456`
+*(Hoặc có thể tự bấm Đăng ký tài khoản mới trực tiếp trên giao diện)*
+
+### 7.2. Quản trị viên (Admin - Quản lý Kho & Định mức)
+- **Đường dẫn truy cập**: [http://localhost:3000/admin](http://localhost:3000/admin)
+- **Chức năng**:
+  - Xem tổng quan tồn kho, số món cảnh báo sắp hết hàng.
+  - Bấm nút **"Nhập kho"** để thêm số lượng nguyên liệu (Sữa tươi, Hạt cà phê, Matcha, v.v.).
+  - Bấm nút **"Công thức"** để chỉnh sửa định mức nguyên liệu tiêu hao cho từng món.
+
+### 7.3. Mã Voucher giảm giá có sẵn
+- `BREW10`: Giảm **10%** tổng hóa đơn.
+- `WELCOME20`: Giảm **20%** tổng hóa đơn.
+
+---
+
+## 8. Chạy Test Suites tự động (Automated Verification)
+
+Dự án sở hữu bộ kiểm thử tự động toàn diện với Vitest cho cả Frontend và Backend gồm **13 test suites (86 test cases)**:
+
+### 8.1. Kiểm thử Backend API (`apps/api`)
+```powershell
+cd apps/api
+npm run test
+```
+*Kết quả: **47/47 tests passed (100%)** bao gồm:*
+- Kiểm thử State Machine (`assertTransition` chặn nhảy cóc trạng thái).
+- Kiểm thử Idempotency (`idempotencyKey` không nhân đôi tiền và điểm).
+- Kiểm thử Optimistic Locking (chống bán vượt tồn kho khi concurrency cao).
+- Kiểm thử CRUD sản phẩm, đơn hàng, nguyên liệu kho và xác thực bcrypt/JWT.
+
+### 8.2. Kiểm thử Frontend Web (`apps/web`)
+```powershell
+cd apps/web
+npm run test
+```
+*Kết quả: **39/39 tests passed (100%)** bao gồm:*
+- Kiểm thử công thức tính giá động theo Size (S/M/L) và Topping.
+- Kiểm thử logic giỏ hàng (thêm món, tăng giảm, xóa, lưu LocalStorage).
+- Kiểm thử giới hạn tồn kho không cho thêm vượt quá số lượng kho.
+- Kiểm thử giao diện ProductModal, CartDrawer và MenuPage (loading/empty/error states).
