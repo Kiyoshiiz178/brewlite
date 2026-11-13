@@ -45,6 +45,18 @@ Bài tập lớn môn Công nghệ Phần mềm (Học kỳ I - Năm học 2026-
 | **Task 9** | Xác nhận, lịch sử đơn & bàn giao | Tâm, Thịnh (Toàn đội) | Modal xác nhận mã đơn (#id), timeline tiến trình `GET /orders/me`, Docker Compose trọn gói 3 services | ✅ Hoàn thành |
 | **Task 10**| Nghiệp vụ Backend nâng cao | Tâm, Thịnh | Order State Machine, Idempotent Payment (`Idempotency-Key`), Optimistic Locking tồn kho, Loyalty Points | ✅ Hoàn thành |
 
+### 2.3. Tỷ lệ đóng góp của từng thành viên (Tổng 100%)
+
+| Thành viên | Tỷ lệ | Vai trò / Đóng góp chính |
+|---|---:|---|
+| **Tâm** | **35%** | Kiến trúc hệ thống, Backend API, Auth JWT, Thanh toán (Mock, VNPay Sandbox, VietQR), State Machine, Optimistic Locking, Docker & CI |
+| **Trung** | **25%** | Frontend Menu, Tùy chọn món (Size/Topping), Giỏ hàng (`CartProvider`/`localStorage`) & bộ test Frontend (39 tests) |
+| **Tuân** | **25%** | Backend Core, Products/Orders API, Validation DTO, unit test Backend & dữ liệu/hình ảnh |
+| **Tài** | **5%** | Hỗ trợ kiểm tra/merge PR trên GitHub & phối hợp nhóm |
+| **Quân** | **5%** | Hỗ trợ cấu hình môi trường, merge PR & phối hợp nhóm |
+| **Thịnh** | **5%** | Hỗ trợ tài liệu / chuẩn bị demo & phối hợp nhóm |
+| **Tổng** | **100%** | |
+
 ---
 
 ## 3. Danh sách Endpoints API chính

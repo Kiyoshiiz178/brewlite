@@ -1,0 +1,357 @@
+\documentclass[12pt,a4paper]{article}
+
+% ==========================================
+% GÓI HỖ TRỢ TIẾNG VIỆT VÀ ĐỊNH DẠNG FONT
+% ==========================================
+\usepackage[utf8]{inputenc}
+\usepackage[vietnamese]{babel}
+\usepackage{lmodern}
+
+% ==========================================
+% CĂN CHỈNH TRANG & KHOẢNG CÁCH
+% ==========================================
+\usepackage{geometry}
+\geometry{
+    a4paper,
+    top=2.5cm,
+    bottom=2.5cm,
+    left=2.2cm,
+    right=2.2cm
+}
+
+% ==========================================
+% CÁC GÓI BỔ TRỢ ĐỒ HỌA, BẢNG BIỂU & KHUNG
+% ==========================================
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{fancyhdr}
+
+% Cấu hình Header và Footer
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textbf{Dự án BrewLite} -- Tài liệu User Stories (Assignment 1)}
+\fancyhead[R]{\small\thepage}
+\fancyfoot[C]{\footnotesize Hệ thống Đặt \& Thanh toán Đồ uống Không dùng Tiền mặt}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% Định nghĩa bảng màu chủ đạo
+\definecolor{brandblue}{RGB}{20, 60, 110}
+\definecolor{accentblue}{RGB}{41, 128, 185}
+\definecolor{lightbg}{RGB}{248, 250, 252}
+\definecolor{taghigh}{RGB}{192, 57, 43}
+\definecolor{tagmedium}{RGB}{211, 84, 0}
+
+% Cấu hình liên kết hyperref
+\hypersetup{
+    colorlinks=true,
+    linkcolor=brandblue,
+    urlcolor=accentblue
+}
+
+% Định nghĩa Box trình bày User Story
+\newtcolorbox{userstorybox}[2][]{
+    enhanced,
+    colback=lightbg,
+    colframe=brandblue,
+    coltitle=white,
+    fonttitle=\bfseries\large,
+    title={#2},
+    arc=2.5mm,
+    boxrule=0.9pt,
+    left=4mm, right=4mm, top=3.5mm, bottom=3.5mm,
+    drop fuzzy shadow=black!10,
+    #1
+}
+
+% ==========================================
+% PHẦN BÌA VÀ TIÊU ĐỀ
+% ==========================================
+\title{
+    \vspace{-1.5cm}
+    \Huge\textbf{\textcolor{brandblue}{BrewLite}}\\
+    \vspace{0.3cm}
+    \Large\textbf{TÀI LIỆU YÊU CẦU NGƯỜI DÙNG (USER STORIES)}\\
+    \large\textit{Hệ thống Đặt \& Thanh toán Đồ uống Không dùng Tiền mặt (Assignment 1)}
+}
+\author{
+    \textbf{Đơn vị phát triển:} Nhóm Đồ án BrewLite \\
+    \textbf{Kiến trúc:} Monorepo (Next.js Frontend + NestJS API + PostgreSQL/Prisma)
+}
+\date{\today}
+
+% ==========================================
+% BẮT ĐẦU TÀI LIỆU
+% ==========================================
+\begin{document}
+
+\maketitle
+\vspace{0.5cm}
+
+\begin{abstract}
+Tài liệu này mô tả các vai trò người dùng (Personas) và danh sách User Stories kèm tiêu chí nghiệm thu (Acceptance Criteria) theo đúng phạm vi triển khai thực tế của các Task trong \textbf{Assignment 1 -- BrewLite}, bao gồm: duyệt thực đơn, tùy chọn món, giỏ hàng, xác thực JWT, đặt hàng, thanh toán không tiền mặt (Mock Gateway, VNPay Sandbox), xác nhận/theo dõi đơn hàng và xử lý nghiệp vụ Backend nâng cao.
+\end{abstract}
+
+\vspace{0.4cm}
+\tableofcontents
+\vspace{0.6cm}
+\hrule
+\vspace{0.6cm}
+
+% ==========================================
+% 1. VAI TRÒ NGƯỜI DÙNG (PERSONAS)
+% ==========================================
+\section{Vai trò người dùng (User Personas)}
+
+\begin{table}[h!]
+\centering
+\begin{tabularx}{\textwidth}{l p{4cm} X}
+\toprule
+\textbf{Mã} & \textbf{Vai trò} & \textbf{Mô tả \& Phạm vi thao tác chính} \\
+\midrule
+\textbf{CUS} & Khách hàng (Customer) & Xem thực đơn, tùy chọn Size/Topping, quản lý giỏ hàng, đăng ký/đăng nhập (JWT), áp mã khuyến mãi, thanh toán không tiền mặt, xem xác nhận và lịch sử trạng thái đơn hàng. \\
+\addlinespace
+\textbf{BAR} & Barista / Quản lý quầy & Truy cập trang điều phối (\texttt{/admin}) để theo dõi danh sách đơn hàng theo trạng thái (làm mới định kỳ 5 giây) và cập nhật tiến trình pha chế theo Order State Machine. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\newpage
+
+% ==========================================
+% 2. DANH SÁCH USER STORIES
+% ==========================================
+\section{Chi tiết User Stories theo Task (Assignment 1)}
+
+% ------------------------------------------
+% EPIC 1: THỰC ĐƠN, TÙY CHỌN & GIỎ HÀNG
+% ------------------------------------------
+\subsection{Epic 1: Thực đơn, Tùy chọn món \& Giỏ hàng (Task 2, 3, 4, 5)}
+
+% --- US-01 ---
+\begin{userstorybox}{US-01: Duyệt menu, lọc danh mục, tìm kiếm và xử lý trạng thái tải/lỗi}
+    \textbf{Mô tả (Story Narrative):}
+    \begin{quote}
+        Là một \textbf{Khách hàng (Customer)},\\
+        Tôi muốn \textbf{xem danh sách thức uống từ API, lọc theo danh mục, tìm kiếm theo tên và nhận thông báo rõ ràng khi tải hoặc lỗi},\\
+        Để \textbf{dễ dàng chọn được đồ uống còn hàng trong menu}.
+    \end{quote}
+
+    \textbf{Thông tin bổ sung:}
+    \begin{itemize}[noitemsep]
+        \item \textbf{Task liên quan:} Task 2 (\texttt{GET /products}, \texttt{GET /products/:id}) \& Task 3 (Menu UI)
+        \item \textbf{Độ ưu tiên:} \textcolor{taghigh}{\textbf{Cao (High)}} \quad|\quad \textbf{Story Points:} 3
+        \item \textbf{Phạm vi áp dụng:} \texttt{apps/web} \& \texttt{apps/api}
+    \end{itemize}
+
+    \textbf{Tiêu chí nghiệm thu (Acceptance Criteria):}
+    \begin{enumerate}[noitemsep]
+        \item \textbf{Given} khách truy cập trang chủ, \textbf{When} ứng dụng đang gọi \texttt{GET /products}, \textbf{Then} hiển thị 6 khung chờ (skeleton loading).
+        \item \textbf{Given} API trả về danh sách đồ uống, \textbf{When} khách chọn tab danh mục (\textit{Tất cả}, \textit{Cà phê}, \textit{Trà trái cây}, \textit{Trà sữa \& Matcha}) hoặc nhập từ khóa vào ô tìm kiếm, \textbf{Then} lưới món được lọc tức thì kèm hình ảnh, giá gốc và số ly tồn kho.
+        \item \textbf{Given} món có \texttt{stock <= 0}, \textbf{When} hiển thị trên menu, \textbf{Then} gắn nhãn \textit{``Tạm hết món''} và vô hiệu hóa nút \textit{``Tùy chọn''}.
+        \item \textbf{Given} gọi API \texttt{GET /products} thất bại, \textbf{When} trang hiển thị lỗi, \textbf{Then} hiện thông báo lỗi kèm nút \textit{``Thử lại''} và không hiển thị nhầm trạng thái menu trống.
+    \end{enumerate}
+\end{userstorybox}
+
+\vspace{0.4cm}
+
+% --- US-02 ---
+\begin{userstorybox}{US-02: Tùy chỉnh thức uống (Size, Topping) và tính giá động}
+    \textbf{Mô tả (Story Narrative):}
+    \begin{quote}
+        Là một \textbf{Khách hàng (Customer)},\\
+        Tôi muốn \textbf{chọn kích cỡ (Size S/M/L), thêm topping và chọn số lượng trong giới hạn tồn kho},\\
+        Để \textbf{xem tổng giá chính xác trước khi đưa vào giỏ hàng}.
+    \end{quote}
+
+    \textbf{Thông tin bổ sung:}
+    \begin{itemize}[noitemsep]
+        \item \textbf{Task liên quan:} Task 4 (Chi tiết \& tùy chọn sản phẩm)
+        \item \textbf{Độ ưu tiên:} \textcolor{taghigh}{\textbf{Cao (High)}} \quad|\quad \textbf{Story Points:} 5
+        \item \textbf{Phạm vi áp dụng:} \texttt{apps/web} (\texttt{ProductModal}, \texttt{pricing.ts})
+    \end{itemize}
+
+    \textbf{Tiêu chí nghiệm thu (Acceptance Criteria):}
+    \begin{enumerate}[noitemsep]
+        \item \textbf{Given} khách bấm \textit{``Tùy chọn''} ở một món còn hàng, \textbf{When} modal mở ra, \textbf{Then} hiển thị 3 kích cỡ (\texttt{S}: tiêu chuẩn, \texttt{M}: +5.000đ, \texttt{L}: +10.000đ), các topping (\textit{Trân châu đen}, \textit{Kem cheese}, \textit{Thạch trái cây}: +5.000đ/loại) và bộ tăng giảm số lượng.
+        \item \textbf{Given} khách thay đổi Size, tick Topping hoặc đổi số lượng, \textbf{When} thao tác trên modal, \textbf{Then} tổng tiền thanh toán tự động cập nhật theo đúng công thức khớp với Backend.
+        \item \textbf{Given} số lượng món đã có trong giỏ đạt giới hạn tồn kho (\texttt{product.stock}), \textbf{When} khách mở lại modal, \textbf{Then} nút thêm bị khóa và thông báo đã đủ số ly còn lại.
+    \end{enumerate}
+\end{userstorybox}
+
+\newpage
+
+% --- US-03 ---
+\begin{userstorybox}{US-03: Quản lý giỏ hàng (Cart) và lưu trữ trên trình duyệt}
+    \textbf{Mô tả (Story Narrative):}
+    \begin{quote}
+        Là một \textbf{Khách hàng (Customer)},\\
+        Tôi muốn \textbf{thêm, tăng/giảm số lượng, xóa món trong giỏ hàng và giữ lại giỏ khi tải lại trang},\\
+        Để \textbf{linh hoạt điều chỉnh đơn hàng trước khi thanh toán}.
+    \end{quote}
+
+    \textbf{Thông tin bổ sung:}
+    \begin{itemize}[noitemsep]
+        \item \textbf{Task liên quan:} Task 5 (Giỏ hàng \& Kiểm thử tự động)
+        \item \textbf{Độ ưu tiên:} \textcolor{taghigh}{\textbf{Cao (High)}} \quad|\quad \textbf{Story Points:} 3
+        \item \textbf{Phạm vi áp dụng:} \texttt{apps/web} (\texttt{CartProvider}, \texttt{CartDrawer}, \texttt{cart.ts})
+    \end{itemize}
+
+    \textbf{Tiêu chí nghiệm thu (Acceptance Criteria):}
+    \begin{enumerate}[noitemsep]
+        \item \textbf{Given} khách thêm món vào giỏ, \textbf{When} trùng món, Size và Topping đã có, \textbf{Then} hệ thống gộp dòng và cộng dồn số lượng (không vượt quá tồn kho), đồng thời cập nhật badge đếm tổng số ly trên Navbar.
+        \item \textbf{Given} khách mở \textit{``Giỏ hàng''}, \textbf{When} bấm tăng/giảm số lượng hoặc xóa món, \textbf{Then} thành tiền từng món và tổng cộng được tính lại ngay lập tức.
+        \item \textbf{Given} giỏ hàng đang có món, \textbf{When} khách tải lại trang, \textbf{Then} dữ liệu giỏ hàng được khôi phục nguyên vẹn từ \texttt{localStorage} (\texttt{brewlite\_cart}).
+    \end{enumerate}
+\end{userstorybox}
+
+\vspace{0.4cm}
+
+% ------------------------------------------
+% EPIC 2: XÁC THỰC NGƯỜI DÙNG (JWT)
+% ------------------------------------------
+\subsection{Epic 2: Đăng ký \& Đăng nhập tài khoản (Task 7 -- FR-04)}
+
+% --- US-04 ---
+\begin{userstorybox}{US-04: Đăng ký và đăng nhập bảo mật bằng JWT}
+    \textbf{Mô tả (Story Narrative):}
+    \begin{quote}
+        Là một \textbf{Khách hàng (Customer)},\\
+        Tôi muốn \textbf{đăng ký tài khoản mới và đăng nhập để nhận token JWT},\\
+        Để \textbf{đặt đơn hàng, theo dõi lịch sử đơn và tích lũy điểm thưởng cá nhân}.
+    \end{quote}
+
+    \textbf{Thông tin bổ sung:}
+    \begin{itemize}[noitemsep]
+        \item \textbf{Task liên quan:} Task 7 (\texttt{POST /auth/register}, \texttt{POST /auth/login}, \texttt{GET /auth/me})
+        \item \textbf{Độ ưu tiên:} \textcolor{taghigh}{\textbf{Cao (High)}} \quad|\quad \textbf{Story Points:} 3
+        \item \textbf{Phạm vi áp dụng:} \texttt{apps/api} (\texttt{AuthModule}, \texttt{JwtAuthGuard}) \& \texttt{apps/web} (\texttt{AuthModal})
+    \end{itemize}
+
+    \textbf{Tiêu chí nghiệm thu (Acceptance Criteria):}
+    \begin{enumerate}[noitemsep]
+        \item \textbf{Given} khách gửi \texttt{POST /auth/register} với email chưa tồn tại và mật khẩu hợp lệ, \textbf{When} xử lý thành công, \textbf{Then} mật khẩu được băm bằng \texttt{bcrypt} (cost = 10) và lưu tài khoản vào PostgreSQL.
+        \item \textbf{Given} khách gửi \texttt{POST /auth/login} đúng thông tin, \textbf{When} xác thực thành công, \textbf{Then} hệ thống trả về \texttt{access\_token} (JWT) cùng thông tin user (\texttt{id}, \texttt{email}, \texttt{loyaltyPoints}).
+        \item \textbf{Given} người dùng chưa đăng nhập (không có Bearer Token hợp lệ), \textbf{When} gọi \texttt{POST /orders}, \texttt{GET /orders/me} hoặc \texttt{GET /auth/me}, \textbf{Then} \texttt{JwtAuthGuard} trả về \texttt{401 Unauthorized}; trên giao diện khi bấm thanh toán sẽ mở modal đăng nhập.
+    \end{enumerate}
+\end{userstorybox}
+
+\newpage
+
+% ------------------------------------------
+% EPIC 3: ĐẶT HÀNG & THANH TOÁN KHÔNG TIỀN MẶT
+% ------------------------------------------
+\subsection{Epic 3: Đặt hàng, Khuyến mãi \& Thanh toán Không tiền mặt (Task 6, 8, 10)}
+
+% --- US-05 ---
+\begin{userstorybox}{US-05: Tạo đơn hàng, áp mã khuyến mãi và kiểm soát tồn kho đồng thời}
+    \textbf{Mô tả (Story Narrative):}
+    \begin{quote}
+        Là một \textbf{Khách hàng đã đăng nhập (Customer)},\\
+        Tôi muốn \textbf{gửi đơn hàng kèm mã khuyến mãi hợp lệ và được kiểm tra tồn kho chính xác},\\
+        Để \textbf{đơn hàng được ghi nhận ở trạng thái chờ thanh toán mà không xảy ra bán vượt tồn kho}.
+    \end{quote}
+
+    \textbf{Thông tin bổ sung:}
+    \begin{itemize}[noitemsep]
+        \item \textbf{Task liên quan:} Task 6 (\texttt{POST /orders}) \& Task 10 (Optimistic Locking, Promotions)
+        \item \textbf{Độ ưu tiên:} \textcolor{taghigh}{\textbf{Khẩn cấp (Critical)}} \quad|\quad \textbf{Story Points:} 5
+        \item \textbf{Phạm vi áp dụng:} \texttt{apps/api} (\texttt{OrdersService}, \texttt{PromotionsService}) \& \texttt{CheckoutModal}
+    \end{itemize}
+
+    \textbf{Tiêu chí nghiệm thu (Acceptance Criteria):}
+    \begin{enumerate}[noitemsep]
+        \item \textbf{Given} khách gửi \texttt{POST /orders} kèm JWT và danh sách món hợp lệ (\texttt{CreateOrderDto}), \textbf{When} \texttt{class-validator} xác thực đạt, \textbf{Then} Backend tự tính lại tổng tiền, trừ kho và lưu đơn hàng ở trạng thái \texttt{PENDING}.
+        \item \textbf{Given} khách nhập mã khuyến mãi (\texttt{BREW10} giảm 10\%, \texttt{WELCOME20} giảm 20\%), \textbf{When} kiểm tra qua \texttt{GET /promotions/validate} và tạo đơn, \textbf{Then} hóa đơn được giảm đúng phần trăm (hoặc báo \texttt{400 Bad Request} nếu mã không hợp lệ).
+        \item \textbf{Given} nhiều khách đặt cùng lúc một món sắp hết hàng, \textbf{When} thực thi trong Prisma Transaction với Optimistic Locking (\texttt{version} và \texttt{stock >= qty}), \textbf{Then} số lượng bán ra không bao giờ vượt quá tồn kho hiện có.
+    \end{enumerate}
+\end{userstorybox}
+
+\vspace{0.4cm}
+
+% --- US-06 ---
+\begin{userstorybox}{US-06: Thanh toán không tiền mặt (Mock Gateway, VNPay Sandbox) \& Idempotency}
+    \textbf{Mô tả (Story Narrative):}
+    \begin{quote}
+        Là một \textbf{Khách hàng (Customer)},\\
+        Tôi muốn \textbf{thanh toán đơn hàng qua Ví điện tử/Thẻ mô phỏng hoặc cổng VNPay Sandbox và được bảo vệ khi lỗi hoặc bấm trùng},\\
+        Để \textbf{hoàn tất giao dịch an toàn, không bị trừ tiền hay cộng điểm hai lần}.
+    \end{quote}
+
+    \textbf{Thông tin bổ sung:}
+    \begin{itemize}[noitemsep]
+        \item \textbf{Task liên quan:} Task 8 (Cashless Payment) \& Task 10 (Idempotency, Loyalty Points)
+        \item \textbf{Độ ưu tiên:} \textcolor{taghigh}{\textbf{Khẩn cấp (Critical)}} \quad|\quad \textbf{Story Points:} 5
+        \item \textbf{Phạm vi áp dụng:} \texttt{apps/api} (\texttt{PaymentsService}) \& \texttt{apps/web} (\texttt{CheckoutModal}, \texttt{MockPaymentGatewayModal}, \texttt{/vnpay-return})
+    \end{itemize}
+
+    \textbf{Tiêu chí nghiệm thu (Acceptance Criteria):}
+    \begin{enumerate}[noitemsep]
+        \item \textbf{Given} đơn ở trạng thái \texttt{PENDING}, \textbf{When} thanh toán thành công qua \texttt{POST /payments} (hoặc xác thực chữ ký HMAC-SHA512 trả về từ \textbf{VNPay Sandbox} tại \texttt{/payments/vnpay-verify}), \textbf{Then} đơn chuyển sang \texttt{PAID}, lưu bản ghi \texttt{Payment}, cộng điểm thưởng (10.000 VNĐ = 1 điểm) vào \texttt{LoyaltyTransaction} và xóa giỏ hàng.
+        \item \textbf{Given} giao dịch thất bại hoặc người dùng chọn mô phỏng lỗi/hủy trên cổng thanh toán, \textbf{When} API xử lý lỗi, \textbf{Then} đơn chuyển sang \texttt{PAYMENT\_FAILED} và \textbf{giỏ hàng trên trình duyệt vẫn được giữ nguyên} để khách thử lại.
+        \item \textbf{Given} cùng một \texttt{idempotencyKey} được gửi lặp lại tới \texttt{POST /payments}, \textbf{When} hệ thống kiểm tra khóa duy nhất trong bảng \texttt{Payment}, \textbf{Then} trả lại kết quả cũ (\texttt{isIdempotentReplay: true}), không tạo thêm thanh toán và không cộng trùng điểm loyalty.
+    \end{enumerate}
+\end{userstorybox}
+
+\newpage
+
+% ------------------------------------------
+% EPIC 4: XÁC NHẬN, THEO DÕI & XỬ LÝ ĐƠN HÀNG
+% ------------------------------------------
+\subsection{Epic 4: Xác nhận, Theo dõi lịch sử \& Điều phối đơn hàng (Task 9, 10)}
+
+% --- US-07 ---
+\begin{userstorybox}{US-07: Xem xác nhận mã đơn và theo dõi tiến độ trong lịch sử đơn}
+    \textbf{Mô tả (Story Narrative):}
+    \begin{quote}
+        Là một \textbf{Khách hàng (Customer)},\\
+        Tôi muốn \textbf{xem màn hình xác nhận mã đơn ngay khi thanh toán xong và kiểm tra tiến độ đơn trong lịch sử},\\
+        Để \textbf{nắm rõ trạng thái đồ uống từ lúc chờ pha đến khi sẵn sàng nhận tại quầy}.
+    \end{quote}
+
+    \textbf{Thông tin bổ sung:}
+    \begin{itemize}[noitemsep]
+        \item \textbf{Task liên quan:} Task 9 (\texttt{GET /orders/me}, Order Confirmation \& History)
+        \item \textbf{Độ ưu tiên:} \textcolor{tagmedium}{\textbf{Trung bình (Medium)}} \quad|\quad \textbf{Story Points:} 3
+        \item \textbf{Phạm vi áp dụng:} \texttt{apps/web} (\texttt{OrderConfirmationModal}, \texttt{OrderHistoryView})
+    \end{itemize}
+
+    \textbf{Tiêu chí nghiệm thu (Acceptance Criteria):}
+    \begin{enumerate}[noitemsep]
+        \item \textbf{Given} thanh toán thành công trên màn hình chính, \textbf{When} \texttt{OrderConfirmationModal} hiển thị, \textbf{Then} khách thấy mã đơn hàng (\texttt{\#id}), trạng thái \texttt{PAID}, số điểm loyalty vừa nhận và lời mời tới quầy nhận nước.
+        \item \textbf{Given} khách đã đăng nhập mở tab \textit{``Lịch sử đơn''}, \textbf{When} tải dữ liệu từ \texttt{GET /orders/me} (hoặc bấm nút \textit{``Làm mới''}), \textbf{Then} hiển thị danh sách đơn từ mới nhất kèm thanh tiến trình 5 bước (\texttt{PENDING} $\rightarrow$ \texttt{PAID} $\rightarrow$ \texttt{PREPARING} $\rightarrow$ \texttt{READY} $\rightarrow$ \texttt{COMPLETED}).
+    \end{enumerate}
+\end{userstorybox}
+
+\vspace{0.4cm}
+
+% --- US-08 ---
+\begin{userstorybox}{US-08: Điều phối đơn hàng theo State Machine tại quầy Barista}
+    \textbf{Mô tả (Story Narrative):}
+    \begin{quote}
+        Là một \textbf{Nhân viên Pha chế (Barista / Quản lý quầy)},\\
+        Tôi muốn \textbf{xem danh sách đơn hàng tại màn hình quầy và cập nhật trạng thái xử lý theo đúng quy trình},\\
+        Để \textbf{đảm bảo đơn hàng chuyển trạng thái hợp lệ và đồng bộ cho khách hàng}.
+    \end{quote}
+
+    \textbf{Thông tin bổ sung:}
+    \begin{itemize}[noitemsep]
+        \item \textbf{Task liên quan:} Task 10 (Order State Machine: \texttt{PATCH /orders/:id/status})
+        \item \textbf{Độ ưu tiên:} \textcolor{tagmedium}{\textbf{Trung bình (Medium)}} \quad|\quad \textbf{Story Points:} 3
+        \item \textbf{Phạm vi áp dụng:} \texttt{apps/api} (\texttt{order-state-machine.ts}) \& \texttt{apps/web} (\texttt{/admin})
+    \end{itemize}
+
+    \textbf{Tiêu chí nghiệm thu (Acceptance Criteria):}
+    \begin{enumerate}[noitemsep]
+        \item \textbf{Given} Barista mở trang \texttt{/admin}, \textbf{When} hệ thống gọi \texttt{GET /orders} (tự động cập nhật mỗi 5 giây), \textbf{Then} hiển thị danh sách đơn và lọc theo các trạng thái (\texttt{PAID}, \texttt{PREPARING}, \texttt{READY}, \texttt{COMPLETED}, \texttt{PENDING}, \texttt{CANCELLED}).
+        \item \textbf{Given} đơn đang ở trạng thái hợp lệ, \textbf{When} Barista gọi \texttt{PATCH /orders/:id/status} theo luồng \texttt{PAID} $\rightarrow$ \texttt{PREPARING} $\rightarrow$ \texttt{READY} $\rightarrow$ \texttt{COMPLETED} (hoặc hủy sang \texttt{CANCELLED} từ \texttt{PENDING}/\texttt{PAID}/\texttt{PAYMENT\_FAILED}), \textbf{Then} trạng thái đơn được cập nhật thành công.
+        \item \textbf{Given} có yêu cầu chuyển trạng thái sai quy tắc (nhảy cóc như \texttt{PENDING} $\rightarrow$ \texttt{READY} hoặc quay lui như \texttt{COMPLETED} $\rightarrow$ \texttt{PAID}), \textbf{When} hàm \texttt{assertTransition} kiểm tra, \textbf{Then} Backend từ chối và trả về lỗi \texttt{400 Bad Request}.
+    \end{enumerate}
+\end{userstorybox}
+
+\end{document}
+
