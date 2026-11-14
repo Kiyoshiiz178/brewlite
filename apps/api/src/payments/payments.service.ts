@@ -3,6 +3,8 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  OnModuleInit,
+  OnModuleDestroy,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreatePaymentDto, MockWebhookDto } from './dto/create-payment.dto.js';
@@ -21,8 +23,132 @@ export interface ProcessPaymentResult {
 }
 
 @Injectable()
-export class PaymentsService {
+export class PaymentsService implements OnModuleInit, OnModuleDestroy {
+  private sepayPollTimer: NodeJS.Timeout | null = null;
+  private processedSepayTxns: Set<string> = new Set();
+
   constructor(private readonly prisma: PrismaService) {}
+
+  async onModuleInit() {
+    const token = process.env.SEPAY_API_TOKEN;
+    if (token && token.trim() !== '') {
+      console.log('[SePay Auto-Sync] Đã kích hoạt đối soát tự động qua SePay User API (Pull 2.5s)');
+      await this.seedExistingSepayTransactions(token.trim());
+      this.startSepayPolling(token.trim());
+    }
+  }
+
+  onModuleDestroy() {
+    if (this.sepayPollTimer) {
+      clearInterval(this.sepayPollTimer);
+      this.sepayPollTimer = null;
+    }
+  }
+
+  private async seedExistingSepayTransactions(token: string) {
+    try {
+      const res = await fetch(
+        'https://my.sepay.vn/userapi/transactions/list?account_number=6563617082006&limit=20',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+      if (!res.ok) return;
+      const data: any = await res.json().catch(() => ({}));
+      const transactions = data.transactions || [];
+      const pendingOrders = await this.prisma.order.findMany({
+        where: { status: OrderStatus.PENDING },
+        select: { id: true },
+      });
+
+      for (const txn of transactions) {
+        const ref = String(txn.reference_number || txn.id);
+        const txnId = String(txn.id);
+        const content = String(txn.transaction_content || '').toUpperCase();
+        const cleanContent = content.replace(/[^A-Z0-9]/g, '');
+        const hasMatchingPending = pendingOrders.some((o) => {
+          const orderStr = String(o.id);
+          return cleanContent.includes(`BREWLITE${orderStr}`) || cleanContent.includes(orderStr);
+        });
+        if (!hasMatchingPending) {
+          this.processedSepayTxns.add(ref);
+          this.processedSepayTxns.add(txnId);
+        }
+      }
+    } catch {
+      // Bỏ qua lỗi mạng
+    }
+  }
+
+  private startSepayPolling(token: string) {
+    this.sepayPollTimer = setInterval(async () => {
+      try {
+        await this.syncSepayTransactions(token);
+      } catch {
+        // Bỏ qua lỗi mạng trong lúc polling
+      }
+    }, 2500);
+  }
+
+  async syncSepayTransactions(token: string) {
+    try {
+      const pendingCount = await this.prisma.order.count({
+        where: { status: OrderStatus.PENDING },
+      });
+      if (pendingCount === 0) return;
+
+      const res = await fetch(
+        'https://my.sepay.vn/userapi/transactions/list?account_number=6563617082006&limit=10',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      if (!res.ok) return;
+
+      const data: any = await res.json().catch(() => ({}));
+      const transactions = data.transactions || [];
+
+      for (const txn of transactions) {
+        const amount = Number(txn.amount_in || 0);
+        if (amount <= 0) continue;
+
+        const referenceCode = String(txn.reference_number || txn.id);
+        const txnId = String(txn.id || '');
+
+        if (this.processedSepayTxns.has(referenceCode) || this.processedSepayTxns.has(txnId)) {
+          continue;
+        }
+
+        const content = String(txn.transaction_content || '');
+
+        const result = await this.handleSepayWebhook({
+          gateway: txn.bank_brand_name || 'MBBank',
+          accountNumber: txn.account_number || '6563617082006',
+          content,
+          transferType: 'in',
+          description: content,
+          transferAmount: amount,
+          referenceCode,
+          id: txn.id,
+          transactionDate: txn.transaction_date,
+        });
+
+        if (result && result.success) {
+          this.processedSepayTxns.add(referenceCode);
+          this.processedSepayTxns.add(txnId);
+        }
+      }
+    } catch {
+      // Bỏ qua lỗi mạng
+    }
+  }
 
   async processPayment(dto: CreatePaymentDto): Promise<ProcessPaymentResult> {
     // 1. Kiểm tra Idempotency (Task 10.2)
@@ -335,21 +461,39 @@ export class PaymentsService {
     const referenceCode = String(data.referenceCode || `SEPAY-${data.id || Date.now()}`);
 
     // 2. Tìm mã đơn hàng từ nội dung chuyển khoản
-    // Khớp: BREWLITE56, BREWLITE 56, BREW56, DH56, DON56 hoặc #56 hoặc số đơn
+    // Khớp: BREWLITE56, BREWLITE 56, BREW56, ORD-56, DH56, DON56 hoặc #56
     const match =
       content.match(/BREWLITE\s*#?(\d+)/i) ||
       content.match(/BREW\s*#?(\d+)/i) ||
+      content.match(/ORD[-_]?(\d+)/i) ||
       content.match(/DH\s*#?(\d+)/i) ||
       content.match(/DON\s*#?(\d+)/i) ||
-      content.match(/#(\d+)/) ||
-      content.match(/(\d+)/);
+      content.match(/#(\d+)/);
 
-    if (!match) {
+    let orderId: number | null = null;
+    if (match) {
+      orderId = parseInt(match[1], 10);
+    } else {
+      // Fallback: Tìm đơn PENDING có ID khớp nội dung
+      try {
+        const pendingOrders = await this.prisma.order.findMany({
+          where: { status: OrderStatus.PENDING },
+          select: { id: true },
+        });
+        const cleanContent = content.replace(/[^A-Z0-9]/g, '');
+        const matched = pendingOrders.find((po) => cleanContent.includes(String(po.id)));
+        if (matched) {
+          orderId = matched.id;
+        }
+      } catch {
+        // bỏ qua lỗi query
+      }
+    }
+
+    if (!orderId) {
       console.warn(`[SePay Webhook] Không tìm thấy mã đơn hàng trong nội dung: "${content}"`);
       return { success: false, message: `Không tìm thấy mã đơn hàng trong nội dung: "${content}"` };
     }
-
-    const orderId = parseInt(match[1], 10);
     const order = await this.prisma.order.findUnique({ where: { id: orderId } });
 
     if (!order) {
