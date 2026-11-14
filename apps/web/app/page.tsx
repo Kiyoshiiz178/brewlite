@@ -201,6 +201,9 @@ export default function Home() {
     // Clear cart on successful payment
     clear();
 
+    // Reload products to immediately reflect updated warehouse stock (Số lượng ly & nguyên liệu còn lại)
+    loadProducts();
+
     // Refresh user profile to show updated loyalty points (Task 10.4)
     if (token) {
       fetchUserProfile(token)
@@ -261,6 +264,7 @@ export default function Home() {
             onRetryPayment={(order) => {
               setVietQrData({ orderId: order.id, amount: order.total });
             }}
+            onRefreshProducts={loadProducts}
           />
         ) : (
           <div className="max-w-6xl mx-auto px-4 py-8">

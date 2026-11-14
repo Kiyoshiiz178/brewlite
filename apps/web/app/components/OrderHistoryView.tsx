@@ -8,15 +8,20 @@ import {
   ShoppingBag,
   CreditCard,
   Loader2,
+  Sparkles,
+  CheckCircle2,
+  Undo2,
 } from 'lucide-react';
 import { Order } from '../types';
 import { fetchMyOrders, updateOrderStatus } from '../lib/api';
+import { getDrinkInfo } from './ProductCard';
 
 interface OrderHistoryViewProps {
   token: string | null;
   onOpenAuth: () => void;
   onGoToMenu: () => void;
   onRetryPayment?: (order: Order) => void;
+  onRefreshProducts?: () => void;
 }
 
 const STATUS_CONFIG: Record<
@@ -74,6 +79,7 @@ export const OrderHistoryView: React.FC<OrderHistoryViewProps> = ({
   onOpenAuth,
   onGoToMenu,
   onRetryPayment,
+  onRefreshProducts,
 }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(Boolean(token));
@@ -183,13 +189,24 @@ export const OrderHistoryView: React.FC<OrderHistoryViewProps> = ({
       ) : (
         <div className="space-y-4">
           {orders.map((order) => {
-            const statusMeta = STATUS_CONFIG[order.status] || {
-              label: order.status,
-              color: 'text-stone-300',
-              border: 'border-stone-700',
-              bg: 'bg-stone-800',
-            };
+            const isCancelled = order.status === 'CANCELLED';
+            const wasPaidBeforeCancel = isCancelled && Boolean(order.payments && order.payments.length > 0);
+
+            const statusMeta = wasPaidBeforeCancel
+              ? {
+                  label: 'ĐÃ HỦY (HOÀN TIỀN 100%)',
+                  color: 'text-rose-400',
+                  border: 'border-rose-500/40',
+                  bg: 'bg-rose-500/15',
+                }
+              : STATUS_CONFIG[order.status] || {
+                  label: order.status,
+                  color: 'text-stone-300',
+                  border: 'border-stone-700',
+                  bg: 'bg-stone-800',
+                };
             const currentStepIdx = FLOW_STEPS.indexOf(order.status);
+            const totalCups = order.items.reduce((acc, it) => acc + it.qty, 0);
 
             return (
               <div
@@ -268,32 +285,44 @@ export const OrderHistoryView: React.FC<OrderHistoryViewProps> = ({
                 )}
 
                 {/* Items in order */}
-                <div className="pt-3 space-y-1.5">
-                  <div className="text-[11px] text-stone-400 uppercase tracking-wider font-semibold">
-                    Món đã đặt:
+                <div className="pt-3 space-y-2">
+                  <div className="flex items-center justify-between text-[11px] text-stone-400 uppercase tracking-wider font-semibold">
+                    <span>Món đã đặt ({totalCups} ly):</span>
+                    <span className="text-amber-500/90 font-mono text-[10px] lowercase">
+                      {isCancelled ? '✓ Đã hoàn trả kho' : '✓ Đã trừ định mức kho'}
+                    </span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {order.items.map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex items-center justify-between p-2 rounded-xl bg-stone-800/40 text-xs"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-amber-500">
-                            {item.qty}x
-                          </span>
-                          <span className="text-stone-200">
-                            {item.product?.name || `Món #${item.productId}`}
-                          </span>
-                          <span className="text-[10px] px-1 rounded bg-stone-700 text-stone-300">
-                            Size {item.size}
-                          </span>
+                    {order.items.map((item) => {
+                      const drinkInfo = getDrinkInfo(item.product?.name || '');
+                      return (
+                        <div
+                          key={item.id}
+                          className="flex flex-col justify-between p-2.5 rounded-xl bg-stone-800/40 text-xs border border-stone-800/50 space-y-1.5"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="font-extrabold text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded">
+                                {item.qty}x
+                              </span>
+                              <span className="text-stone-100 font-semibold">
+                                {item.product?.name || `Món #${item.productId}`}
+                              </span>
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-stone-700 text-stone-300 font-bold">
+                                Size {item.size}
+                              </span>
+                            </div>
+                            <span className="text-amber-400 font-bold">
+                              {item.lineTotal.toLocaleString('vi-VN')}đ
+                            </span>
+                          </div>
+                          <div className="text-[10px] text-stone-400 flex items-center gap-1 font-mono">
+                            <Sparkles className="w-3 h-3 text-amber-500 shrink-0" />
+                            <span className="truncate">Định mức: {drinkInfo.ingredients}</span>
+                          </div>
                         </div>
-                        <span className="text-stone-300 font-medium">
-                          {item.lineTotal.toLocaleString('vi-VN')}đ
-                        </span>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -302,11 +331,56 @@ export const OrderHistoryView: React.FC<OrderHistoryViewProps> = ({
                   <div className="mt-3 pt-2 border-t border-stone-800/60 flex items-center justify-between text-[11px] text-stone-400">
                     <div className="flex items-center gap-1.5">
                       <CreditCard className="w-3.5 h-3.5 text-stone-500" />
-                      <span>Phương thức: {order.payments[0].method === 'WALLET' ? 'Ví điện tử' : 'Thẻ ngân hàng'}</span>
+                      <span>Phương thức: {order.payments[0].method === 'WALLET' ? 'Ví điện tử' : 'Thẻ ngân hàng / QR'}</span>
                     </div>
                     <span className="text-stone-500 font-mono text-[10px]">
                       Key: {order.payments[0].idempotencyKey.substring(0, 16)}...
                     </span>
+                  </div>
+                )}
+
+                {/* Action Bar for PAID (Cancel & Refund flow - State Machine PAID -> CANCELLED) */}
+                {order.status === 'PAID' && (
+                  <div className="mt-3 pt-3 border-t border-stone-800/80 flex flex-wrap items-center justify-between gap-3 bg-stone-950/60 p-3.5 rounded-2xl border border-stone-800">
+                    <div className="text-xs">
+                      <span className="font-bold text-emerald-400 flex items-center gap-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        Đã thanh toán thành công · Đang chờ Barista pha chế
+                      </span>
+                      <span className="text-[11px] text-stone-400 mt-0.5 block">
+                        Bạn có thể yêu cầu hủy đơn và nhận hoàn tiền 100% trước khi quầy bắt đầu làm món.
+                      </span>
+                    </div>
+                    <div>
+                      <button
+                        onClick={async () => {
+                          if (
+                            confirm(
+                              `Bạn có chắc chắn muốn hủy đơn hàng #${order.id} và nhận hoàn tiền ${order.total.toLocaleString(
+                                'vi-VN',
+                              )}đ không?\nToàn bộ ${totalCups} ly và nguyên liệu kho sẽ được hoàn lại đầy đủ.`,
+                            )
+                          ) {
+                            try {
+                              await updateOrderStatus(order.id, 'CANCELLED');
+                              alert(
+                                `Đã hủy đơn hàng #${order.id} và xử lý hoàn tiền ${order.total.toLocaleString(
+                                  'vi-VN',
+                                )}đ thành công! Toàn bộ nguyên liệu đã được hoàn về kho.`,
+                              );
+                              await loadOrders();
+                              if (onRefreshProducts) onRefreshProducts();
+                            } catch (e: any) {
+                              alert(e?.message || 'Lỗi khi hủy đơn hàng');
+                            }
+                          }
+                        }}
+                        className="px-3.5 py-1.5 rounded-xl border border-rose-500/40 hover:border-rose-500 hover:bg-rose-500/20 text-rose-300 text-xs font-semibold transition flex items-center gap-1.5 shadow-sm"
+                      >
+                        <Undo2 className="w-3.5 h-3.5 text-rose-400" />
+                        <span>Hủy đơn & Hoàn tiền (Hoàn kho)</span>
+                      </button>
+                    </div>
                   </div>
                 )}
 
@@ -333,6 +407,7 @@ export const OrderHistoryView: React.FC<OrderHistoryViewProps> = ({
                             try {
                               await updateOrderStatus(order.id, 'CANCELLED');
                               await loadOrders();
+                              if (onRefreshProducts) onRefreshProducts();
                             } catch (e: any) {
                               alert(e?.message || 'Lỗi khi hủy đơn hàng');
                             }
@@ -351,6 +426,25 @@ export const OrderHistoryView: React.FC<OrderHistoryViewProps> = ({
                         </button>
                       )}
                     </div>
+                  </div>
+                )}
+
+                {/* Cancelled Notice */}
+                {isCancelled && (
+                  <div className="mt-3 p-3 rounded-2xl bg-stone-950/60 border border-stone-800/80 flex items-center justify-between text-xs text-stone-400">
+                    <div className="flex items-center gap-2">
+                      <Undo2 className="w-4 h-4 text-rose-400 shrink-0" />
+                      <span>
+                        {wasPaidBeforeCancel
+                          ? `Đơn hàng đã được hoàn trả ${order.total.toLocaleString(
+                              'vi-VN',
+                            )}đ và hoàn toàn bộ ${totalCups} ly nguyên liệu vào kho.`
+                          : `Đơn hàng đã hủy và hoàn lại toàn bộ ${totalCups} ly nguyên liệu tồn kho.`}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-stone-800 text-stone-300 shrink-0">
+                      Kho đã hoàn tất
+                    </span>
                   </div>
                 )}
               </div>
