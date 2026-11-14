@@ -2,10 +2,11 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { X, Plus, Minus, Check } from 'lucide-react';
+import { X, Plus, Minus, Check, Sparkles } from 'lucide-react';
 import { Product } from '../types';
 import type { NewCartItem } from '../lib/cart';
 import { SIZES, TOPPINGS, TOPPING_PRICE, SizeId, calcUnitPrice, formatVnd } from '../lib/pricing';
+import { getDrinkInfo } from './ProductCard';
 
 const resolveDrinkImage = (name: string, imageUrl?: string | null): string => {
   if (imageUrl && imageUrl.trim().length > 0 && !imageUrl.startsWith('http://img.com')) return imageUrl;
@@ -72,6 +73,7 @@ const ProductModalContent: React.FC<ContentProps> = ({
   const maxQty = Math.max(0, product.stock - inCartQty);
   const unitPrice = calcUnitPrice(product.price, size, selectedToppings);
   const lineTotal = unitPrice * qty;
+  const drinkInfo = getDrinkInfo(product.name);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -144,6 +146,15 @@ const ProductModalContent: React.FC<ContentProps> = ({
 
         {/* Customization Body */}
         <div className="p-4 sm:p-5 overflow-y-auto space-y-4 flex-1">
+          {/* Thông tin hương vị & Liên kết nguyên liệu kho */}
+          <div className="p-3 bg-stone-950/70 border border-stone-800 rounded-2xl space-y-1.5">
+            <p className="text-xs text-stone-300 leading-relaxed">{drinkInfo.desc}</p>
+            <div className="text-[11px] text-amber-400/90 font-mono flex items-center gap-1.5 pt-1.5 border-t border-stone-800/80">
+              <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span>Định mức kho: {drinkInfo.ingredients}</span>
+            </div>
+          </div>
+
           {/* Size selection */}
           <div>
             <h3 className="text-xs font-bold text-stone-300 uppercase tracking-wider mb-2 flex items-center justify-between">

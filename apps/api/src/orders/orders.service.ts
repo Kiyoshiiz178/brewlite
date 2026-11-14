@@ -208,7 +208,17 @@ export class OrdersService {
   }
 
   async updateStatus(id: number, nextStatus: string) {
-    const order = await this.prisma.order.findUnique({ where: { id } });
+    const order = await this.prisma.order.findUnique({
+      where: { id },
+      include: {
+        items: {
+          include: {
+            product: true,
+          },
+        },
+        payments: true,
+      },
+    });
     if (!order) {
       throw new NotFoundException(`Không tìm thấy đơn hàng #${id}`);
     }
@@ -216,14 +226,36 @@ export class OrdersService {
     // State machine check
     assertTransition(order.status, nextStatus);
 
-    // Hoàn kho nguyên liệu nếu hủy đơn hàng
+    const wasPaid = order.status === OrderStatus.PAID;
+
+    // Hoàn kho nguyên liệu và xử lý hoàn tiền nếu hủy đơn hàng
     if (nextStatus === OrderStatus.CANCELLED && order.status !== OrderStatus.CANCELLED) {
       if ((this.prisma as any).recipeItem && typeof (this.prisma as any).recipeItem.findMany === 'function') {
         await this.inventoryService.restoreIngredientsForOrder(id, this.prisma);
       }
+
+      // Thu hồi điểm tích lũy nếu đơn hàng đã được cộng điểm khi PAID
+      if (wasPaid && order.userId) {
+        const pointsToRollback = Math.floor(order.total / 10000);
+        if (pointsToRollback > 0) {
+          await this.prisma.user.update({
+            where: { id: order.userId },
+            data: {
+              loyaltyPoints: { decrement: pointsToRollback },
+            },
+          });
+          await this.prisma.loyaltyTransaction.create({
+            data: {
+              userId: order.userId,
+              points: -pointsToRollback,
+              reason: `Thu hồi điểm do hủy đơn & hoàn tiền đơn hàng #${order.id}`,
+            },
+          });
+        }
+      }
     }
 
-    return this.prisma.order.update({
+    const updated = await this.prisma.order.update({
       where: { id },
       data: { status: nextStatus },
       include: {
@@ -232,7 +264,15 @@ export class OrdersService {
             product: true,
           },
         },
+        payments: true,
       },
     });
+
+    return {
+      ...updated,
+      isRefunded: wasPaid,
+      refundAmount: wasPaid ? order.total : 0,
+      refundMessage: wasPaid ? `Đã hoàn tiền ${order.total.toLocaleString('vi-VN')}đ vào tài khoản nguồn` : null,
+    };
   }
 }

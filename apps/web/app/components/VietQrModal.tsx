@@ -11,7 +11,7 @@ import {
   QrCode,
   AlertCircle,
 } from 'lucide-react';
-import { fetchOrderById } from '../lib/api';
+import { fetchOrderById, updateOrderStatus } from '../lib/api';
 
 interface VietQrModalProps {
   isOpen: boolean;
@@ -19,6 +19,7 @@ interface VietQrModalProps {
   amount: number;
   onClose: () => void;
   onSuccess: (orderId: number, status: string, pointsEarned?: number) => void;
+  onCancelOrder?: (orderId: number) => Promise<void> | void;
 }
 
 export const VietQrModal: React.FC<VietQrModalProps> = ({
@@ -27,10 +28,12 @@ export const VietQrModal: React.FC<VietQrModalProps> = ({
   amount,
   onClose,
   onSuccess,
+  onCancelOrder,
 }) => {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [checkCount, setCheckCount] = useState(0);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   const bankName = 'MBBank (Quân Đội)';
   const accountNumber = '6563617082006';
@@ -44,6 +47,26 @@ export const VietQrModal: React.FC<VietQrModalProps> = ({
     navigator.clipboard.writeText(text);
     setCopiedField(field);
     setTimeout(() => setCopiedField(null), 2000);
+  };
+
+  const handleCancel = async () => {
+    if (!orderId) {
+      onClose();
+      return;
+    }
+    setIsCancelling(true);
+    try {
+      if (onCancelOrder) {
+        await onCancelOrder(orderId);
+      } else {
+        await updateOrderStatus(orderId, 'CANCELLED').catch(() => {});
+        onClose();
+      }
+    } catch {
+      onClose();
+    } finally {
+      setIsCancelling(false);
+    }
   };
 
   // Tự động kiểm tra trạng thái đơn hàng mỗi 1.5 giây (Webhook SePay tự động bắn về)
@@ -77,7 +100,8 @@ export const VietQrModal: React.FC<VietQrModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
       <div className="bg-stone-900 border border-stone-800 rounded-3xl max-w-md w-full p-6 shadow-2xl text-stone-100 flex flex-col relative max-h-[92vh] overflow-y-auto">
         <button
-          onClick={onClose}
+          onClick={handleCancel}
+          disabled={isCancelling}
           className="absolute top-4 right-4 p-2 rounded-full text-stone-400 hover:text-white transition"
         >
           <X className="w-5 h-5" />
@@ -196,13 +220,17 @@ export const VietQrModal: React.FC<VietQrModalProps> = ({
               </span>
             </div>
 
-            {/* Cancel Button */}
-            <button
-              onClick={onClose}
-              className="w-full py-2.5 rounded-xl border border-stone-800 hover:border-stone-700 text-stone-400 hover:text-stone-200 text-xs font-medium transition"
-            >
-              Hủy / Đổi phương thức khác
-            </button>
+            {/* Action Buttons */}
+            <div className="space-y-2">
+              <button
+                onClick={handleCancel}
+                disabled={isCancelling}
+                className="w-full py-2.5 rounded-xl border border-stone-800 hover:border-stone-700 text-stone-300 hover:text-white text-xs font-semibold transition flex items-center justify-center gap-1.5 bg-stone-950/40"
+              >
+                {isCancelling ? <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-500" /> : null}
+                <span>Hủy / Đổi phương thức khác</span>
+              </button>
+            </div>
           </>
         )}
       </div>

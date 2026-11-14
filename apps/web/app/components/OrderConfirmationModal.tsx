@@ -49,6 +49,11 @@ export const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
             </span>
           </div>
 
+          <div className="flex justify-between items-center text-sm pt-1 border-t border-stone-700/60">
+            <span className="text-stone-400">Tồn kho nguyên liệu:</span>
+            <span className="font-semibold text-emerald-400 text-xs">✓ Đã xuất kho thành công</span>
+          </div>
+
           {pointsEarned && pointsEarned > 0 ? (
             <div className="flex justify-between items-center text-sm pt-1 border-t border-stone-700/60">
               <span className="text-stone-400 flex items-center gap-1">
