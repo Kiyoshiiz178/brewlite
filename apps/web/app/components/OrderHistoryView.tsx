@@ -370,8 +370,8 @@ export const OrderHistoryView: React.FC<OrderHistoryViewProps> = ({
                               );
                               await loadOrders();
                               if (onRefreshProducts) onRefreshProducts();
-                            } catch (e: any) {
-                              alert(e?.message || 'Lỗi khi hủy đơn hàng');
+                            } catch (e: unknown) {
+                              alert(e instanceof Error ? e.message : 'Lỗi khi hủy đơn hàng');
                             }
                           }
                         }}
@@ -408,8 +408,8 @@ export const OrderHistoryView: React.FC<OrderHistoryViewProps> = ({
                               await updateOrderStatus(order.id, 'CANCELLED');
                               await loadOrders();
                               if (onRefreshProducts) onRefreshProducts();
-                            } catch (e: any) {
-                              alert(e?.message || 'Lỗi khi hủy đơn hàng');
+                            } catch (e: unknown) {
+                              alert(e instanceof Error ? e.message : 'Lỗi khi hủy đơn hàng');
                             }
                           }
                         }}
