@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Coffee, Sparkles, AlertCircle, ArrowRight, Search, X } from 'lucide-react';
 import { Product, UserProfile } from './types';
 import type { NewCartItem } from './lib/cart';
-import { fetchProducts, fetchUserProfile } from './lib/api';
+import { fetchProducts, fetchUserProfile, updateOrderStatus } from './lib/api';
 import { Navbar } from './components/Navbar';
 import { ProductCard } from './components/ProductCard';
 import { ProductModal } from './components/ProductModal';
@@ -258,6 +258,9 @@ export default function Home() {
             token={token}
             onOpenAuth={() => setIsAuthOpen(true)}
             onGoToMenu={() => setActiveTab('menu')}
+            onRetryPayment={(order) => {
+              setVietQrData({ orderId: order.id, amount: order.total });
+            }}
           />
         ) : (
           <div className="max-w-6xl mx-auto px-4 py-8">
@@ -483,6 +486,25 @@ export default function Home() {
         amount={vietQrData?.amount || 0}
         onClose={() => setVietQrData(null)}
         onSuccess={handlePaymentSuccess}
+        onCancelOrder={async (orderId) => {
+          try {
+            await updateOrderStatus(orderId, 'CANCELLED');
+            showToast(`Đã hủy đơn hàng #${orderId} và hoàn lại nguyên liệu tồn kho.`);
+          } catch {
+            showToast(`Đã đóng cửa sổ thanh toán.`);
+          }
+          setVietQrData(null);
+          setIsCheckoutOpen(true);
+        }}
+        onSimulateFail={async (orderId) => {
+          try {
+            await updateOrderStatus(orderId, 'PAYMENT_FAILED');
+            handlePaymentError(`Thanh toán đơn hàng #${orderId} thất bại. Giỏ hàng đã được giữ nguyên để bạn thử lại.`);
+          } catch {
+            handlePaymentError(`Lỗi xử lý trạng thái đơn hàng #${orderId}.`);
+          }
+          setVietQrData(null);
+        }}
       />
 
       <MockPaymentGatewayModal

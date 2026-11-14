@@ -10,12 +10,13 @@ import {
   Loader2,
 } from 'lucide-react';
 import { Order } from '../types';
-import { fetchMyOrders } from '../lib/api';
+import { fetchMyOrders, updateOrderStatus } from '../lib/api';
 
 interface OrderHistoryViewProps {
   token: string | null;
   onOpenAuth: () => void;
   onGoToMenu: () => void;
+  onRetryPayment?: (order: Order) => void;
 }
 
 const STATUS_CONFIG: Record<
@@ -72,6 +73,7 @@ export const OrderHistoryView: React.FC<OrderHistoryViewProps> = ({
   token,
   onOpenAuth,
   onGoToMenu,
+  onRetryPayment,
 }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(Boolean(token));
@@ -305,6 +307,50 @@ export const OrderHistoryView: React.FC<OrderHistoryViewProps> = ({
                     <span className="text-stone-500 font-mono text-[10px]">
                       Key: {order.payments[0].idempotencyKey.substring(0, 16)}...
                     </span>
+                  </div>
+                )}
+
+                {/* Action Bar for PENDING & PAYMENT_FAILED (State Machine Actions) */}
+                {(order.status === 'PENDING' || order.status === 'PAYMENT_FAILED') && (
+                  <div className="mt-3 pt-3 border-t border-stone-800/80 flex flex-wrap items-center justify-between gap-3 bg-stone-950/60 p-3.5 rounded-2xl border border-stone-800">
+                    <div className="text-xs">
+                      <span className="font-bold text-amber-400 flex items-center gap-1.5">
+                        <AlertCircle className="w-3.5 h-3.5" />
+                        {order.status === 'PENDING'
+                          ? 'Đơn hàng đang chờ thanh toán'
+                          : 'Giao dịch thanh toán chưa thành công'}
+                      </span>
+                      <span className="text-[11px] text-stone-400 mt-0.5 block">
+                        {order.status === 'PENDING'
+                          ? 'Bạn có thể tiếp tục thanh toán hoặc hủy đơn để hoàn trả nguyên liệu.'
+                          : 'Giỏ hàng được giữ nguyên. Bạn có thể thanh toán lại hoặc hủy đơn.'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={async () => {
+                          if (confirm(`Bạn có chắc chắn muốn hủy đơn hàng #${order.id} và hoàn lại nguyên liệu?`)) {
+                            try {
+                              await updateOrderStatus(order.id, 'CANCELLED');
+                              await loadOrders();
+                            } catch (e: any) {
+                              alert(e?.message || 'Lỗi khi hủy đơn hàng');
+                            }
+                          }
+                        }}
+                        className="px-3.5 py-1.5 rounded-xl border border-stone-700 hover:border-rose-500/50 hover:bg-rose-500/10 text-stone-300 hover:text-rose-300 text-xs font-semibold transition"
+                      >
+                        Hủy đơn (Hoàn kho)
+                      </button>
+                      {onRetryPayment && (
+                        <button
+                          onClick={() => onRetryPayment(order)}
+                          className="px-4 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-bold shadow-md shadow-amber-500/10 transition"
+                        >
+                          Thanh toán lại
+                        </button>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
