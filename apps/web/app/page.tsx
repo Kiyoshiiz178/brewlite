@@ -496,15 +496,6 @@ export default function Home() {
           setVietQrData(null);
           setIsCheckoutOpen(true);
         }}
-        onSimulateFail={async (orderId) => {
-          try {
-            await updateOrderStatus(orderId, 'PAYMENT_FAILED');
-            handlePaymentError(`Thanh toán đơn hàng #${orderId} thất bại. Giỏ hàng đã được giữ nguyên để bạn thử lại.`);
-          } catch {
-            handlePaymentError(`Lỗi xử lý trạng thái đơn hàng #${orderId}.`);
-          }
-          setVietQrData(null);
-        }}
       />
 
       <MockPaymentGatewayModal

@@ -10,7 +10,6 @@ import {
   Sparkles,
   QrCode,
   AlertCircle,
-  XCircle,
 } from 'lucide-react';
 import { fetchOrderById, updateOrderStatus } from '../lib/api';
 
@@ -21,7 +20,6 @@ interface VietQrModalProps {
   onClose: () => void;
   onSuccess: (orderId: number, status: string, pointsEarned?: number) => void;
   onCancelOrder?: (orderId: number) => Promise<void> | void;
-  onSimulateFail?: (orderId: number) => Promise<void> | void;
 }
 
 export const VietQrModal: React.FC<VietQrModalProps> = ({
@@ -31,7 +29,6 @@ export const VietQrModal: React.FC<VietQrModalProps> = ({
   onClose,
   onSuccess,
   onCancelOrder,
-  onSimulateFail,
 }) => {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -63,23 +60,6 @@ export const VietQrModal: React.FC<VietQrModalProps> = ({
         await onCancelOrder(orderId);
       } else {
         await updateOrderStatus(orderId, 'CANCELLED').catch(() => {});
-        onClose();
-      }
-    } catch {
-      onClose();
-    } finally {
-      setIsCancelling(false);
-    }
-  };
-
-  const handleSimulateFailure = async () => {
-    if (!orderId) return;
-    setIsCancelling(true);
-    try {
-      if (onSimulateFail) {
-        await onSimulateFail(orderId);
-      } else {
-        await updateOrderStatus(orderId, 'PAYMENT_FAILED').catch(() => {});
         onClose();
       }
     } catch {
@@ -248,16 +228,7 @@ export const VietQrModal: React.FC<VietQrModalProps> = ({
                 className="w-full py-2.5 rounded-xl border border-stone-800 hover:border-stone-700 text-stone-300 hover:text-white text-xs font-semibold transition flex items-center justify-center gap-1.5 bg-stone-950/40"
               >
                 {isCancelling ? <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-500" /> : null}
-                <span>Hủy đơn & Đổi phương thức khác (Hoàn kho)</span>
-              </button>
-
-              <button
-                onClick={handleSimulateFailure}
-                disabled={isCancelling}
-                className="w-full py-2 rounded-xl bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 text-rose-300 text-[11px] font-medium transition flex items-center justify-center gap-1.5"
-              >
-                <XCircle className="w-3.5 h-3.5 text-rose-400" />
-                <span>Mô phỏng lỗi thanh toán (Test case: PAYMENT_FAILED)</span>
+                <span>Hủy / Đổi phương thức khác</span>
               </button>
             </div>
           </>
