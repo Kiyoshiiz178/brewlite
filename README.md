@@ -27,8 +27,8 @@ Bài tập lớn môn Công nghệ Phần mềm (Học kỳ I - Năm học 2026-
   - Phụ trách cấu trúc API backend (NestJS), thiết kế cơ sở dữ liệu PostgreSQL, migration Prisma, API sản phẩm và API tạo đơn hàng (Task 1, Task 2, Task 6).
 - **Cặp 2 — Frontend, Menu & Giỏ hàng**: **Trung** & **Tài**
   - Phụ trách giao diện người dùng Next.js, hiển thị lưới menu, chi tiết món tùy chọn size/topping, giỏ hàng CartProvider và bộ test frontend Vitest (Task 1, Task 3, Task 4, Task 5).
-- **Cặp 3 — Nghiệp vụ, Thanh toán & Scrum**: **Tâm** & **Thịnh**
-  - Phụ trách xác thực JWT/bcrypt, đa kênh thanh toán không tiền mặt (VietQR SePay, VNPay, Mock), màn hình xác nhận/lịch sử, State machine, tồn kho đồng thời (Optimistic Locking), quản lý kho BOM, Docker Compose và quản lý Scrum (Task 7, Task 8, Task 9, Task 10).
+- **Cặp 3 — Nghiệp vụ, Thanh toán & Scrum**: **Tâm (Product Owner & Scrum Master)** & **Thịnh (Developer - Tester & Docs)**
+  - Phụ trách quản lý Scrum/Backlog, xác thực JWT/bcrypt, đa kênh thanh toán không tiền mặt (VietQR SePay, VNPay, Mock), màn hình xác nhận/lịch sử, State machine, tồn kho đồng thời (Optimistic Locking), quản lý kho BOM, Docker Compose, kiểm thử thủ công và tài liệu bàn giao (Task 7, Task 8, Task 9, Task 10).
 
 ### 2.2. Danh sách 10 Task Scrum
 
@@ -47,15 +47,15 @@ Bài tập lớn môn Công nghệ Phần mềm (Học kỳ I - Năm học 2026-
 
 ### 2.3. Tỷ lệ đóng góp của từng thành viên (Tổng 100%)
 
-| Thành viên | Tỷ lệ | Vai trò / Đóng góp chính |
-|---|---:|---|
-| **Tâm** | **35%** | Kiến trúc hệ thống, Backend API, Auth JWT, Thanh toán (Mock, VNPay Sandbox, VietQR), State Machine, Optimistic Locking, Docker & CI |
-| **Trung** | **25%** | Frontend Menu, Tùy chọn món (Size/Topping), Giỏ hàng (`CartProvider`/`localStorage`) & bộ test Frontend (39 tests) |
-| **Tuân** | **25%** | Backend Core, Products/Orders API, Validation DTO, unit test Backend & dữ liệu/hình ảnh |
-| **Tài** | **5%** | Hỗ trợ kiểm tra/merge PR trên GitHub & phối hợp nhóm |
-| **Quân** | **5%** | Hỗ trợ cấu hình môi trường, merge PR & phối hợp nhóm |
-| **Thịnh** | **5%** | Hỗ trợ tài liệu / chuẩn bị demo & phối hợp nhóm |
-| **Tổng** | **100%** | |
+| Thành viên | MSSV | Tỷ lệ | Vai trò / Đóng góp chính |
+|---|---|---:|---|
+| **Trần Lê Minh Tâm (nhóm trưởng)** | 3124720064 | **35%** | Product Owner & Scrum Master, Kiến trúc hệ thống, Backend API, Auth JWT, Thanh toán (Mock, VNPay Sandbox, VietQR), State Machine, Optimistic Locking, Docker & CI |
+| **Bùi Minh Trung** | 3124720074 | **25%** | Frontend Menu, Tùy chọn món (Size/Topping), Giỏ hàng (`CartProvider`/`localStorage`) & bộ test Frontend (39 tests) |
+| **Đỗ Thành Tuân** | 3124720076 | **25%** | Backend Core, Products/Orders API, Validation DTO, unit test Backend & dữ liệu/hình ảnh |
+| **Chương Gia Thịnh** | 3124720067 | **5%** | Developer, hỗ trợ soạn thảo test case thủ công, chuẩn bị kịch bản demo bàn giao & phối hợp nhóm |
+| **Hoàng Minh Quân** | 3124720059 | **5%** | Database, Prisma migration, Optimistic Locking, cấu hình môi trường & merge PR |
+| **Nguyễn Thành Tài** | 3124720062 | **5%** | Frontend UI, modal chi tiết, kiểm tra/merge PR trên GitHub & QA |
+| **Tổng** | | **100%** | |
 
 ---
 
