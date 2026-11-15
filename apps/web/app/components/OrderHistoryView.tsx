@@ -206,7 +206,7 @@ export const OrderHistoryView: React.FC<OrderHistoryViewProps> = ({
                   bg: 'bg-stone-800',
                 };
             const currentStepIdx = FLOW_STEPS.indexOf(order.status);
-            const totalCups = order.items.reduce((acc, it) => acc + it.qty, 0);
+            const totalCups = (order.items || []).reduce((acc, it) => acc + it.qty, 0);
 
             return (
               <div
@@ -293,7 +293,7 @@ export const OrderHistoryView: React.FC<OrderHistoryViewProps> = ({
                     </span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {order.items.map((item) => {
+                    {(order.items || []).map((item) => {
                       const drinkInfo = getDrinkInfo(item.product?.name || '');
                       return (
                         <div

@@ -212,24 +212,50 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
         {/* Promo code voucher */}
         <div className="mb-4">
-          <label className="text-xs font-semibold text-stone-400 mb-1.5 block">
-            Mã giảm giá (Gợi ý: BREW10, WELCOME20)
-          </label>
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="text-xs font-semibold text-stone-400 block">
+              Mã giảm giá
+            </label>
+            <div className="flex gap-1.5">
+              <button
+                type="button"
+                onClick={() => { setPromoInput('BREW10'); setPromoError(null); }}
+                className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/30 transition cursor-pointer"
+                title="Bấm để chọn mã BREW10"
+              >
+                BREW10 (-10%)
+              </button>
+              <button
+                type="button"
+                onClick={() => { setPromoInput('WELCOME20'); setPromoError(null); }}
+                className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 border border-amber-500/30 transition cursor-pointer"
+                title="Bấm để chọn mã WELCOME20"
+              >
+                WELCOME20 (-20%)
+              </button>
+            </div>
+          </div>
           <div className="flex gap-2">
             <div className="relative flex-1">
               <Tag className="w-4 h-4 text-stone-500 absolute left-3 top-3" />
               <input
                 type="text"
-                placeholder="Nhập mã ưu đãi..."
+                placeholder="Nhập mã (BREW10 hoặc WELCOME20)..."
                 value={promoInput}
                 onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleApplyPromo();
+                  }
+                }}
                 className="w-full pl-9 pr-3 py-2 bg-stone-800 border border-stone-700 rounded-xl text-xs text-white placeholder-stone-500 uppercase focus:outline-none focus:border-amber-500"
               />
             </div>
             <button
               onClick={handleApplyPromo}
               disabled={isApplyingPromo || !promoInput.trim()}
-              className="px-4 py-2 bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-semibold rounded-xl border border-stone-700 transition disabled:opacity-40"
+              className="px-4 py-2 bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-semibold rounded-xl border border-stone-700 transition disabled:opacity-40 cursor-pointer"
             >
               {isApplyingPromo ? 'Đang kiểm tra...' : 'Áp dụng'}
             </button>
@@ -238,9 +264,18 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             <p className="text-[11px] text-rose-400 mt-1">{promoError}</p>
           )}
           {appliedPromo && (
-            <p className="text-[11px] text-emerald-400 mt-1 flex items-center gap-1">
-              <Check className="w-3.5 h-3.5" /> Đã áp dụng giảm {appliedPromo.discountPct}% từ {appliedPromo.code}
-            </p>
+            <div className="text-[11px] text-emerald-400 mt-1.5 flex items-center justify-between bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg">
+              <span className="flex items-center gap-1">
+                <Check className="w-3.5 h-3.5" /> Đã áp dụng giảm {appliedPromo.discountPct}% từ mã <strong>{appliedPromo.code}</strong>
+              </span>
+              <button
+                type="button"
+                onClick={() => setAppliedPromo(null)}
+                className="text-stone-400 hover:text-stone-200 text-[10px] underline ml-2 cursor-pointer"
+              >
+                Hủy mã
+              </button>
+            </div>
           )}
         </div>
 
